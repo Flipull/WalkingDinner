@@ -59,13 +59,13 @@
             context.SaveChanges();
         }
 
-        protected EventPlan CreateRandomPlan(ICollection<Duo> duos)
+        private EventPlan CreateRandomPlan(ICollection<Duo> duos)
         {
             var stramienen = EventStramien.CreateMogelijkStramien(duos.Count);
             if (stramienen.Count == 0)
                 return null;
             
-            var gekozen_stramien = stramienen[stramienen.Count];
+            var gekozen_stramien = stramienen[stramienen.Count-1];
 
             var plan = new EventPlan()
             {
@@ -84,7 +84,7 @@
             }
             return plan;
         }
-        protected Duo CreateRandomDuo()
+        private Duo CreateRandomDuo()
         {
 
             Duo newduo = new Duo();
@@ -96,7 +96,7 @@
             return newduo;
         }
 
-        protected Tuple<double, double> PostcodeToGeoLocation(string postcode)
+        private Tuple<double, double> PostcodeToGeoLocation(string postcode)
         {
             return null;
         }

@@ -150,6 +150,7 @@
     <Compile Include="Models\EventSchema.cs" />
     <Compile Include="Models\Gang.cs" />
     <Compile Include="Models\Groep.cs" />
+    <Compile Include="Models\PostcodeGeoLocationCache.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WalkingDinnerContext.cs" />
   </ItemGroup>
