@@ -21,22 +21,20 @@
 
         protected override void Seed(WalkingDinnerWebApplication.WalkingDinnerContext context)
         {
-            /*
+            context.Duos.RemoveRange(context.Duos);
+            context.EventPlannen.RemoveRange(context.EventPlannen);
+            context.SaveChanges();
+
             if (context.Duos.Count() > 0)
                 return;
-                //  This method will be called after migrating to the latest version.
-
-                //  You can use the DbSet<T>.AddOrUpdate() helper extension method
-                //  to avoid creating duplicate seed data.
-                for (int i = 0; i < 1000; i++)
+            for (int i = 0; i < 1000; i++)
             {
                 context.Duos.Add(CreateRandomDuo());
             }
             context.SaveChanges();
-            */
             var duolist = context.Duos.ToList();
-            if (duolist.Count == 0) throw new InsufficientMemoryException();
             
+            //maak 10 random plannen met [6..50] random duos
             for (int i = 0; i < 10; i++)
             {
                 var selected_duos = new List<Duo>();
@@ -52,7 +50,9 @@
                     }
                     selected_duos.Add(duo_to_add);
                 }
+
                 var new_plan = CreateRandomPlan(selected_duos);
+                //als het plannen niet gefaald is door verkeerd aantal duos, voeg plan toe
                 if (new_plan != null)
                     context.EventPlannen.Add(new_plan);
             };
