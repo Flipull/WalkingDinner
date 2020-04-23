@@ -5,7 +5,7 @@
     using System.Data.Entity;
     using System.Data.Entity.Migrations;
     using System.Linq;
-    using WalkingDinnerLibrary;
+    using WalkingDinnerWebApplication.Models;
 
     internal sealed class Configuration : DbMigrationsConfiguration<WalkingDinnerWebApplication.WalkingDinnerContext>
     {
@@ -34,8 +34,8 @@
             context.SaveChanges();
             var duolist = context.Duos.ToList();
             
-            //maak 10 random plannen met [6..50] random duos
-            for (int i = 0; i < 10; i++)
+            //maak 50 random plannen met [6..50] random duos
+            for (int i = 0; i < 50; i++)
             {
                 var selected_duos = new List<Duo>();
                 var duo_count = dice.Next(6, 50);
@@ -65,7 +65,7 @@
             if (stramienen.Count == 0)
                 return null;
             
-            var gekozen_stramien = stramienen[dice.Next(stramienen.Count)];
+            var gekozen_stramien = stramienen[stramienen.Count];
 
             var plan = new EventPlan()
             {
@@ -130,7 +130,11 @@
                     continue;
                 
 
-                stramienen.Add(new EventStramien() { MaxGangen = Math.Min(groep_count, MAX_GANGEN), Groepen = groep_count, Groepgrootte = groep_grootte });
+                stramienen.Add(new EventStramien() { 
+                        MaxGangen = Math.Min(groep_grootte, Math.Min(groep_count, MAX_GANGEN)), 
+                        Groepen = groep_count, 
+                        Groepgrootte = groep_grootte 
+                });
             }
             return stramienen;
         }
