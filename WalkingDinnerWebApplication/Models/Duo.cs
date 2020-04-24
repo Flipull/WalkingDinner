@@ -8,25 +8,30 @@ namespace WalkingDinnerWebApplication.Models
     {
         [Key]
         public int Id { get; set; }
-
+        
         [Required]
         [MaxLength(6)]
         public string PostCode { get; set; }
 
         [Required]
-        [MaxLength(8)]
-        public string Huisnummer { get; set; }
+        [MaxLength(64)]
+        public string Adres { get; set; }
 
         [Required]
-        public double GeoLong { get; set; }
+        public int Huisnummer { get; set; }
 
         [Required]
-        public double GeoLat { get; set; }
+        public float GeoLong { get; set; }
+
+        [Required]
+        public float GeoLat { get; set; }
 
         [Required]
         public string Naam { get; set; }
-
-        virtual public ICollection<EventPlan> IngeschrevenPlannen {get; set;}
         
+        virtual public ICollection<EventPlan> IngeschrevenPlannen { get; set; } = new HashSet<EventPlan>();
+
+        virtual public ICollection<Groep> GeplandeEventGroepen { get; set; } = new HashSet<Groep>();
+
     }
 }

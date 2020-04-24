@@ -23,7 +23,7 @@ namespace WalkingDinnerWebApplication.Models
         public string Naam { get; set; }
 
         
-        virtual public ICollection<Duo> IngeschrevenDuos { get; set; }
+        virtual public ICollection<Duo> IngeschrevenDuos { get; set; } = new HashSet<Duo>();
 
     }
 }

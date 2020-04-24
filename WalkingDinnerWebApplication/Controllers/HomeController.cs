@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 using WalkingDinnerWebApplication.Migrations;
@@ -9,16 +10,22 @@ namespace WalkingDinnerWebApplication.Controllers
 {
     public class HomeController : Controller
     {
+        static private Random dice = new Random();
         public ActionResult Index()
         {
             var context = new WalkingDinnerContext();
 
-            var tst = new List<int>();
-            for (int i = 1; i < 100; i++)
+            //TESTCODE
+            for (int i = 0; i < 10; i++)
+                context.CreateRandomDuo();
+            
+            for (int i = 0; i < 2; i++)
             {
-                var stramienen_count = EventStramien.CreateMogelijkStramien(i).Count;
-                tst.Add(stramienen_count);
+                var duos = context.SelectRandomDuos(dice.Next(8, context.Duos.Count() ));
+                context.CreateRandomPlan(duos);
             }
+            
+            var nieuwschema = context.CreateSchemaFromPlan(context.EventPlannen.First());
 
             return View();
         }

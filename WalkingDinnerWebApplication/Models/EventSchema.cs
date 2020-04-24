@@ -25,7 +25,7 @@ namespace WalkingDinnerWebApplication.Models
         [MaxLength(6)]
         public string VerzamelPostcode { get; set; }
 
-        virtual public ICollection<Gang> Gangen { get; set; }
+        virtual public ICollection<Gang> Gangen { get; set; } = new HashSet<Gang>();
 
     }
 }

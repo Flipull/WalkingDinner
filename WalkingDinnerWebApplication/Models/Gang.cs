@@ -13,7 +13,8 @@ namespace WalkingDinnerWebApplication.Models
         public DateTime EindTijd { get; set; }
 
 
-        virtual public ICollection<Groep> Groepen { get; set; }
+        virtual public EventSchema Schema { get; set; }
+        virtual public ICollection<Groep> Groepen { get; set; } = new HashSet<Groep>();
 
     }
 }
