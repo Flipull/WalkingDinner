@@ -10,7 +10,7 @@ namespace WalkingDinnerWebApplication
     public class WalkingDinnerContext : DbContext
     {
         public WalkingDinnerContext() :
-            base("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False")
+            base("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=WalkingDinner;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False")
         {
 
         }
@@ -38,6 +38,8 @@ namespace WalkingDinnerWebApplication
         public PostcodeGeoLocationCache RandomGeoLocation()
         {
             var total_locs = PostcodeGeoLocationCaches.Count();
+
+            //crashes when you forgot to fill the database-table
             return PostcodeGeoLocationCaches
                 .OrderBy(c => c.Postcode)
                 .Skip(dice.Next(0, total_locs)).First();
@@ -306,54 +308,6 @@ namespace WalkingDinnerWebApplication
             EventSchemas.Add(result);
             SaveChanges();
             return result;
-        }
-
-        private Dictionary<Groep, int> GroepenWithLeastHosts(ICollection<Duo> hosts, ICollection<Groep> groepen)
-        {
-            var groep_hostscount = new Dictionary<Groep, int>();
-            foreach(var groep in groepen)
-            {
-                var counter = 0;
-                foreach(var duo in groep.Gasten)
-                {
-                    if (hosts.Contains(duo))
-                        counter++;
-                }
-                groep_hostscount.Add(groep, counter);
-                Console.Write(counter + " ");
-            }
-            return groep_hostscount;
-        }
-
-        private Tuple<Duo, int> LargestHoster(ICollection<Duo> list)
-        {
-            var map = new Dictionary<Duo, int>();
-            foreach(var duo in list)
-            {
-                if (map.ContainsKey(duo))
-                    map[duo] += 1;
-                else
-                    map.Add(duo, 1);
-            }
-
-            Tuple<Duo, int> biggest = Tuple.Create<Duo, int>(null, 0);
-            foreach (var item in map)
-            {
-                if (item.Value > biggest.Item2)
-                {
-                    biggest = Tuple.Create<Duo, int>(item.Key, item.Value);
-                }
-            }
-            return biggest;
-        }
-
-        private Duo PickRandomDuo(List<Duo> list)
-        {
-            return list[dice.Next(0, list.Count)];
-        }
-        private Duo PickRandomDuo(ICollection<Duo> list)
-        {
-            return list.ElementAt(dice.Next(0, list.Count));
         }
 
     }
