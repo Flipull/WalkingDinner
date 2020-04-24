@@ -13,10 +13,10 @@ namespace WalkingDinnerWebApplication.Models
         public DateTime VerzamelDatum { get; set; }
 
         [Required]
-        public double VerzamelLocatieLong { get; set; }
+        public float VerzamelLocatieLong { get; set; }
 
         [Required]
-        public double VerzamelLocatieLat { get; set; }
+        public float VerzamelLocatieLat { get; set; }
 
         [Required]
         public string VerzamelAdres { get; set; }//string-weergave van straatnaam + huisnummer

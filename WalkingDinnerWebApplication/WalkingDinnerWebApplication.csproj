@@ -131,33 +131,9 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202004240907221_v1.cs" />
-    <Compile Include="Migrations\202004240907221_v1.designer.cs">
-      <DependentUpon>202004240907221_v1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202004241440145_v2.cs" />
-    <Compile Include="Migrations\202004241440145_v2.designer.cs">
-      <DependentUpon>202004241440145_v2.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202004241453055_v21.cs" />
-    <Compile Include="Migrations\202004241453055_v21.designer.cs">
-      <DependentUpon>202004241453055_v21.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202004241502349_v22.cs" />
-    <Compile Include="Migrations\202004241502349_v22.designer.cs">
-      <DependentUpon>202004241502349_v22.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202004241509088_v23.cs" />
-    <Compile Include="Migrations\202004241509088_v23.designer.cs">
-      <DependentUpon>202004241509088_v23.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202004241536599_v24.cs" />
-    <Compile Include="Migrations\202004241536599_v24.designer.cs">
-      <DependentUpon>202004241536599_v24.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202004241703374_v25.cs" />
-    <Compile Include="Migrations\202004241703374_v25.designer.cs">
-      <DependentUpon>202004241703374_v25.cs</DependentUpon>
+    <Compile Include="Migrations\202004242129370_v1.cs" />
+    <Compile Include="Migrations\202004242129370_v1.designer.cs">
+      <DependentUpon>202004242129370_v1.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ApiCaller.cs" />
@@ -171,6 +147,14 @@
     <Compile Include="WalkingDinnerContext.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\dbo.PostcodeGeoLocationCaches.data_1.sql" />
+    <Content Include="App_Data\dbo.PostcodeGeoLocationCaches.data_2.sql" />
+    <Content Include="App_Data\dbo.PostcodeGeoLocationCaches.data_3.sql" />
+    <Content Include="App_Data\dbo.PostcodeGeoLocationCaches.data_4.sql" />
+    <Content Include="App_Data\dbo.PostcodeGeoLocationCaches.data_5.sql" />
+    <Content Include="App_Data\dbo.PostcodeGeoLocationCaches.data_6.sql" />
+    <Content Include="App_Data\dbo.PostcodeGeoLocationCaches.data_7.sql" />
+    <Content Include="App_Data\dbo.PostcodeGeoLocationCaches.data_8.sql" />
     <Content Include="Content\bootstrap-theme.css" />
     <Content Include="Content\bootstrap-theme.min.css" />
     <Content Include="Content\bootstrap.css" />
@@ -181,7 +165,6 @@
     <Content Include="Content\Site.css" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
-    <Content Include="App_Data\dbo.PostcodeGeoLocationCaches.data.zip" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
     <Content Include="Scripts\jquery-3.3.1.min.js" />
@@ -209,29 +192,6 @@
     <Content Include="Views\Home\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202004240907221_v1.resx">
-      <DependentUpon>202004240907221_v1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202004241440145_v2.resx">
-      <DependentUpon>202004241440145_v2.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202004241453055_v21.resx">
-      <DependentUpon>202004241453055_v21.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202004241502349_v22.resx">
-      <DependentUpon>202004241502349_v22.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202004241509088_v23.resx">
-      <DependentUpon>202004241509088_v23.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202004241536599_v24.resx">
-      <DependentUpon>202004241536599_v24.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202004241703374_v25.resx">
-      <DependentUpon>202004241703374_v25.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
     <Content Include="fonts\glyphicons-halflings-regular.ttf" />
@@ -243,6 +203,11 @@
     <None Include="packages.config" />
     <Content Include="Scripts\jquery-3.3.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.3.1.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\202004242129370_v1.resx">
+      <DependentUpon>202004242129370_v1.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
