@@ -16,18 +16,17 @@ namespace WalkingDinnerWebApplication.Controllers
             var context = new WalkingDinnerContext();
             /*
             //TESTCODE
-            for (int i = 0; i < 200; i++)
+            for (int i = 0; i < 250; i++)
                 context.CreateRandomDuo();
-
-            for (int i = 0; i < 20; i++)
+            */
+            /*
+            for (int i = 0; i < 50; i++)
             {
-                var duos = context.SelectRandomDuos(dice.Next(8, context.Duos.Count() ));
+                var duos = context.SelectRandomDuos(dice.Next(8, Math.Min(100, context.Duos.Count()) ));
                 context.CreateRandomPlan(duos);
             }
             */
-
-            var nieuwschema = context.BruteForceSchemaSalesmanProblem(context.EventPlannen.First());
-            
+            //var nieuwschema = context.BruteForceSchemaSalesmanProblem(context.EventPlannen.First());
             return View();
         }
 
