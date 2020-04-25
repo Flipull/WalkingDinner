@@ -50,8 +50,7 @@ namespace WalkingDinnerWebApplication
             PostcodeGeoLocationCache loc = null;
             do
             {
-                //TODO change random location to a less strict choice
-                var x = dice.Next(1000, 1999).ToString();
+                var x = dice.Next(110, 999).ToString();
                 loc = PostcodeGeoLocationCaches.Where(c => c.Postcode.Contains(x))
                 .FirstOrDefault();
             } while (loc == null);
@@ -264,7 +263,7 @@ namespace WalkingDinnerWebApplication
             return distance;
         }
 
-        public static List<T> ShuffleList<T>(List<T> list)
+        private static List<T> ShuffleList<T>(List<T> list)
         {
             Random rnd = new Random();
             for (int i = 0; i < list.Count; i++)
@@ -311,10 +310,12 @@ namespace WalkingDinnerWebApplication
             for (int g = 0; g < plan.AantalGroepen; g++)
             {
                 var groep = new Groep();
-                groep.Host = duos_2d[g, 0];
-                for (int d = 1; d < plan.AantalDuosPerGroep; d++)
+                for (int d = 0; d < plan.AantalDuosPerGroep; d++)
                 {
-                    groep.Gasten.Add(duos_2d[g, d]);
+                    if (d==0)
+                        groep.Host = duos_2d[g, d];
+                    else
+                        groep.Gasten.Add(duos_2d[g, d]);
                 }
                 alle_groepen.Add(groep);
                 gang1.Groepen.Add(groep);
@@ -336,10 +337,12 @@ namespace WalkingDinnerWebApplication
             for (int g = 0; g < plan.AantalGroepen; g++)
             {
                 var groep = new Groep();
-                groep.Host = duos_2d[g, 1];
-                for (int d = 1; d < plan.AantalDuosPerGroep; d++)
+                for (int d = 0; d < plan.AantalDuosPerGroep; d++)
                 {
-                    groep.Gasten.Add(duos_2d[(g + d) % plan.AantalGroepen, d]);
+                    if (d == 1)
+                        groep.Host = duos_2d[(g + d) % plan.AantalGroepen, d];
+                    else
+                        groep.Gasten.Add(duos_2d[(g + d) % plan.AantalGroepen, d]);
                 }
                 alle_groepen.Add(groep);
                 gang2.Groepen.Add(groep);
@@ -361,10 +364,12 @@ namespace WalkingDinnerWebApplication
                 for (int g = 0; g < plan.AantalGroepen; g++)
                 {
                     var groep = new Groep();
-                    groep.Host = duos_2d[g, 2];
                     for (int d = 0; d < plan.AantalDuosPerGroep; d++)
                     {
-                        groep.Gasten.Add(duos_2d[(g - d + plan.AantalGroepen) % plan.AantalGroepen, d]);
+                        if (d == 2)
+                            groep.Host = duos_2d[(g - d + plan.AantalGroepen) % plan.AantalGroepen, d];
+                        else
+                            groep.Gasten.Add(duos_2d[(g - d + plan.AantalGroepen) % plan.AantalGroepen, d]);
                     }
                     alle_groepen.Add(groep);
                     gang3.Groepen.Add(groep);
@@ -387,10 +392,12 @@ namespace WalkingDinnerWebApplication
                 for (int g = 0; g < plan.AantalGroepen; g++)
                 {
                     var groep = new Groep();
-                    groep.Host = duos_2d[g, 3];
                     for (int d = 0; d < plan.AantalDuosPerGroep; d++)
                     {
-                        groep.Gasten.Add(duos_2d[(g + 2*d) % plan.AantalGroepen, d]);
+                        if (d == 3)
+                            groep.Host = duos_2d[(g + 2 * d) % plan.AantalGroepen, d];
+                        else
+                            groep.Gasten.Add(duos_2d[(g + 2 * d) % plan.AantalGroepen, d]);
                     }
                     alle_groepen.Add(groep);
                     gang4.Groepen.Add(groep);
@@ -431,7 +438,7 @@ namespace WalkingDinnerWebApplication
             return (float)(r*c);
         }
 
-        public Groep FindDuoGroepInGang(Gang gang, Duo duo)
+        private Groep FindDuoGroepInGang(Gang gang, Duo duo)
         {
             var groepen = gang.Groepen.ToList();
             for (int g=0; g < groepen.Count; g++)
