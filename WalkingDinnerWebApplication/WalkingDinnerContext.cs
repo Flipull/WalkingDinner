@@ -11,10 +11,11 @@ namespace WalkingDinnerWebApplication
 {
     public class WalkingDinnerContext : DbContext
     {
+        private readonly int _CACHECOUNT;
         public WalkingDinnerContext() :
             base("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=WalkingDinner;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False")
         {
-
+            _CACHECOUNT = this.Database.SqlQuery<int>("select count(*) from PostcodeGeoLocationCaches").First();
         }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -52,10 +53,8 @@ namespace WalkingDinnerWebApplication
             PostcodeGeoLocationCache loc = null;
             do
             {
-                var cachecount = this.Database.SqlQuery<int>("select count(*) from PostcodeGeoLocationCaches").First();
-
                 loc = PostcodeGeoLocationCaches.OrderBy(p => p.Id)
-                                                .Skip(dice.Next(0, cachecount))
+                                                .Skip(dice.Next(0, _CACHECOUNT))
                                                 .Take(1).First();
             } while (loc == null);
             return loc;
@@ -153,13 +152,13 @@ namespace WalkingDinnerWebApplication
             if (stramienen.Count == 0)
                 return null;
             
-            var gekozen_stramien = stramienen[dice.Next(0,stramienen.Count)];
-
+            var gekozen_stramien = stramienen[Math.Max(0 ,dice.Next(0,stramienen.Count+1)-1)];
+            
             var plan = new EventPlan()
             {
                 Naam = "Grappige Naam voor een Eentje",
                 AantalDeelnemers = duos.Count,
-                AantalGangen = dice.Next(EventStramien.MIN_GANGEN,gekozen_stramien.MaxGangen),
+                AantalGangen = dice.Next(EventStramien.MIN_GANGEN,gekozen_stramien.MaxGangen+1),
                 AantalGroepen = gekozen_stramien.Groepen,
                 AantalDuosPerGroep = gekozen_stramien.Groepgrootte
             };
@@ -174,7 +173,7 @@ namespace WalkingDinnerWebApplication
             return plan;
         }
 
-        private T[,] ArrayToMatrix<T>(List<T> items, int w, int h)
+        private T[,] ArrayToMatrixTransposed<T>(List<T> items, int w, int h)
         {
             if (items.Count() != w * h)
                 throw new InvalidOperationException();
@@ -185,22 +184,25 @@ namespace WalkingDinnerWebApplication
             {
                 for (int y = 0; y < h; y++)
                 {
-                    matrix[x, y] = items[y * w + x];
+                    matrix[x, y] = items[y  + x * h];
                 }
             }
             return matrix;
         }
 
-        private T[,] ArrayToMatrixStriped<T>(List<T> items, int w, int h)
+        private T[,] ArrayToMatrix<T>(List<T> items, int w, int h)
         {
             if (items.Count() != w * h)
                 throw new InvalidOperationException();
 
             var matrix = new T[w, h];
-            
-            for (int i = 0; i < items.Count; i++)
+
+            for (int y = 0; y < h; y++)
             {
-                matrix[i / h, i % h] = items[i];
+                for (int x = 0; x < w; x++)
+                {
+                    matrix[x, y] = items[y * w + x];
+                }
             }
             return matrix;
         }
@@ -406,9 +408,9 @@ namespace WalkingDinnerWebApplication
             foreach(var item in pathmap)
             {
                 //squared-distance(weight) == distance weighs heavier; evens out distances between duos
-                //without first and last travel-path (which are outside of event-schema)
-                var travel_items = item.Value.GetRange(1, item.Value.Count-2);
-                distance += travel_items.Sum(p => Math.Pow(p.Distance,2));
+
+                var travel_items = item.Value;//.GetRange(1, item.Value.Count-2);
+                distance += Math.Pow(travel_items.Sum(p => p.Distance),2);
                 if (double.IsNaN(distance) )
                 {
                     Console.WriteLine("!!!");
@@ -418,9 +420,26 @@ namespace WalkingDinnerWebApplication
         }
 
 
+        private static List<T> CircularList<T>(List<T> list)
+        {
+            var count = list.Count;
+            int returncircle_start = (count % 2 == 1 ? 1 : 0);
+            List<T> result = new List<T>();
+            
+            for (int i = count-1; i >= 0; i = i - 2)
+            {
+                result.Add(list[i]);
+            }
+            for (int i = returncircle_start; i < count; i = i + 2)
+            {
+                result.Add(list[i]);
+            }
+            return result;
+
+        }
         private static List<T> ShuffleList<T>(List<T> list, int idx_low, int idx_hi, int count)
         {
-
+            //in-place shuffle
             idx_low = Math.Max(0, Math.Min(list.Count, idx_low));
             idx_hi = Math.Min(list.Count, Math.Max(idx_hi, idx_low));
             count = Math.Min(count, idx_hi - idx_low);
@@ -429,9 +448,10 @@ namespace WalkingDinnerWebApplication
             for (int i = 0; i < count; i++)
             {
                 int k = rnd.Next(idx_low, idx_hi);
+                int l = rnd.Next(idx_low, idx_hi);
                 T value = list[k];
-                list[k] = list[i];
-                list[i] = value;
+                list[k] = list[l];
+                list[l] = value;
             }
             return list;
         }
@@ -460,10 +480,14 @@ namespace WalkingDinnerWebApplication
             List<Duo> duos = plan.IngeschrevenDuos
                                 .OrderBy(d => DistanceBetweenGeoLocations(result.VerzamelLocatieLong, result.VerzamelLocatieLat,
                                                                           d.GeoLong, d.GeoLat
-                    ))
+                    )
+                                )
                                 .ToList();
-            duos = ShuffleList<Duo>(duos, dice.Next(duos.Count), duos.Count, dice.Next(duos.Count));
 
+            //duos = CircularList<Duo>(duos);
+            duos = ShuffleList<Duo>(duos, 0, duos.Count / plan.AantalDuosPerGroep*2, dice.Next(duos.Count / plan.AantalDuosPerGroep));
+            duos = ShuffleList<Duo>(duos, dice.Next(duos.Count), duos.Count, dice.Next(duos.Count));
+            
             //var duos = ShuffleList<Duo>(plan.IngeschrevenDuos.ToList(), 0, plan.IngeschrevenDuos.Count, plan.IngeschrevenDuos.Count);
 
             //arrange duos in 2d-matrix van [AantalGroepen x AantalDuosPerGroep]
@@ -552,6 +576,10 @@ namespace WalkingDinnerWebApplication
                 //gang 4:
                 //elke groep bestaat uit diagonale+2 slices van de matrix 
                 //(groep 1 = [0,0],[2,1],[4,2],[6,3] groep 2 = [1,0],[3,1],[5,2],[7,3] tot aan AantalGroepen
+
+                //gang 4:
+                //elke groep bestaat uit een mixed set van de matrix 
+                //(groep 1 = [1,0],[3,1],[0,2],[2,3] groep 2 = [2,0],[4,1],[1,2],[3,3] tot aan AantalGroepen
                 //  waarbij elke x-index met %AantalGroepen wrapped geselecteerd word)
                 var gang4 = new Gang()
                 {
@@ -561,6 +589,11 @@ namespace WalkingDinnerWebApplication
                 for (int g = 0; g < plan.AantalGroepen; g++)
                 {
                     var groep = new Groep();
+                    groep.Gasten.Add(duos_2d[(g) % plan.AantalGroepen, 0]);
+                    groep.Gasten.Add(duos_2d[(g + 2) % plan.AantalGroepen, 1]);
+                    groep.Gasten.Add(duos_2d[(g - 1 + plan.AantalGroepen) % plan.AantalGroepen, 2]);
+                    groep.Host = duos_2d[(g + 1) % plan.AantalGroepen, 3];
+                    /*
                     for (int d = 0; d < plan.AantalDuosPerGroep; d++)
                     {
                         if (d == 3)
@@ -568,6 +601,7 @@ namespace WalkingDinnerWebApplication
                         else
                             groep.Gasten.Add(duos_2d[(g + 2 * d) % plan.AantalGroepen, d]);
                     }
+                    */
                     alle_groepen.Add(groep);
                     gang4.Groepen.Add(groep);
                 }

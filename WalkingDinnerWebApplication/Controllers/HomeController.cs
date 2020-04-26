@@ -26,7 +26,13 @@ namespace WalkingDinnerWebApplication.Controllers
                 context.CreateRandomPlan(duos);
             }
             */
-            //var nieuwschema = context.BruteForceSchemaSalesmanProblem(context.EventPlannen.First());
+            /*
+            for (int i = 0; i < 10; i++)
+            {
+                var nieuwschema = context.BruteForceSchemaSalesmanProblem(context.EventPlannen.First());
+            }
+            */
+            context.Dispose();
             return View();
         }
 
