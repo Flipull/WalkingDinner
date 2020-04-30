@@ -11,11 +11,9 @@ namespace WalkingDinnerWebApplication
 {
     public class WalkingDinnerContext : DbContext
     {
-        private readonly int _CACHECOUNT;
         public WalkingDinnerContext() :
             base("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=WalkingDinner;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False")
         {
-            _CACHECOUNT = this.Database.SqlQuery<int>("select count(*) from PostcodeGeoLocationCaches").First();
         }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -47,16 +45,16 @@ namespace WalkingDinnerWebApplication
 
 
         private Random dice = new Random();
+        private int _CACHECOUNT = 0;
         public PostcodeGeoLocationCache RandomGeoLocation()
         {
+            if (_CACHECOUNT == 0)
+                _CACHECOUNT = this.Database.SqlQuery<int>("select count(*) from PostcodeGeoLocationCaches").First();
             //TODO: stop hanging when you forgot to fill the database-table
             PostcodeGeoLocationCache loc = null;
-            do
-            {
-                loc = PostcodeGeoLocationCaches.OrderBy(p => p.Id)
-                                                .Skip(dice.Next(0, _CACHECOUNT))
-                                                .Take(1).First();
-            } while (loc == null);
+            loc = PostcodeGeoLocationCaches.OrderBy(p => p.Id)
+                                            .Skip(dice.Next(0, _CACHECOUNT))
+                                            .Take(1).First();
             return loc;
         }
         public PostcodeGeoLocationCache PostcodeToGeoLocation(string postcode, int home_nr)
@@ -98,7 +96,8 @@ namespace WalkingDinnerWebApplication
             newduo.PostCode = geoloc.Postcode;
             newduo.GeoLong = geoloc.GeoLong;
             newduo.GeoLat = geoloc.GeoLat;
-            newduo.Adres = geoloc.Straat;
+            newduo.Stad = geoloc.Stad;
+            newduo.Straat = geoloc.Straat;
             var ar = geoloc.Straat.Split();
             var naam = ar[ar.Length - 1]
                     .Replace("straat", "")
@@ -206,25 +205,99 @@ namespace WalkingDinnerWebApplication
             }
             return matrix;
         }
+        
+        private PostcodeGeoLocationCache GeoLocationToCache(float lng, float lat)
+        {
+            PostcodeGeoLocationCache any_cache = null;
+            /*
+            any_cache = PostcodeGeoLocationCaches
+                .OrderBy(c => Math.Abs(lng - c.GeoLong) + Math.Abs(lat - c.GeoLat))
+                .FirstOrDefault();
+            */
+            //optimized version for DB-indices
+            float epsilon = 1/2048f;
+            do
+            {
+                epsilon *= 2f;
+                any_cache = PostcodeGeoLocationCaches
+                    .Where(c => c.GeoLong > lng - epsilon && c.GeoLong < lng + epsilon
+                            && c.GeoLat > lat - epsilon && c.GeoLat < lat + epsilon)
+                    .FirstOrDefault();
+            } while (any_cache == null);
+            return any_cache;
+        }
+
+        private PostcodeGeoLocationCache DuosToAverageLocation(List<Duo> duos)
+        {
+            var total = duos.Count;
+            float long_sum = 0;
+            float lat_sum = 0;
+            foreach(var duo in duos)
+            {
+                long_sum += duo.GeoLong;
+                lat_sum += duo.GeoLat;
+            }
+            float long_avg = long_sum / total;
+            float lat_avg = lat_sum / total;
+
+            PostcodeGeoLocationCache any_cache = null;
+            float epsilon = 2e-6f;
+            do
+            {
+                epsilon *= 1.5f;
+                any_cache = PostcodeGeoLocationCaches
+                    .Where(c => c.GeoLong > long_avg - epsilon && c.GeoLong < long_avg + epsilon
+                            && c.GeoLat > lat_avg - epsilon && c.GeoLat < lat_avg + epsilon)
+                    .FirstOrDefault();
+            } while (any_cache == null);
+            return any_cache;
+        }
 
         public EventSchema BruteForceSchemaSalesmanProblem(EventPlan plan)
         {
+            var epsilon = 1.00;
+            //var meetingloc = DuosToAverageLocation(plan.IngeschrevenDuos.ToList());
+
+            var duos = plan.IngeschrevenDuos.ToList();
+            var long_min = duos.Min(d => d.GeoLong);
+            var long_max = duos.Max(d => d.GeoLong);
+            var lat_min = duos.Min(d => d.GeoLat);
+            var lat_max = duos.Max(d => d.GeoLat);
+
+            float rand_long = (float)dice.NextDouble() * (long_max - long_min) + long_min;
+            float rand_lat = (float)dice.NextDouble() * (lat_max - lat_min) + lat_min;
+            var meetingloc = GeoLocationToCache(rand_long, rand_lat);
+
             var shortest_travel = float.MaxValue;
             EventSchema schema = null;
             for (int i = 0; i < 250; i++)
             {
-                var new_schema = CreateSchemaFromPlan(plan);
+                var new_schema = CreateSchemaFromPlan(plan, meetingloc);
                 
                 var paths = CalculateSchemaPathing(new_schema);
                 var travel_dist = CalculatePathMapTravelDistance(paths);
-
+                
                 if (travel_dist < shortest_travel)
                 {
                     shortest_travel = travel_dist;
                     schema = new_schema;
+                    epsilon += 0.05;
+                }
+                else if (travel_dist/shortest_travel > epsilon)//threshold to change meetingloc
+                {
+                    //meetingloc = RandomGeoLocation();
+                    rand_long = (float)dice.NextDouble() * (long_max - long_min) + long_min;
+                    rand_lat = (float)dice.NextDouble() * (lat_max - lat_min) + lat_min;
+                    meetingloc = GeoLocationToCache(rand_long, rand_lat);
+                    epsilon += 0.01;
+                }
+                else
+                {
+                    epsilon = Math.Max(1, epsilon - 0.01);
+                    //System.Diagnostics.Debug.WriteLine(travel_dist / shortest_travel);
                 }
             }
-
+            
             EventPlannen.Remove(plan);
             EventSchemas.Add(schema);
             SaveChanges();
@@ -379,7 +452,6 @@ namespace WalkingDinnerWebApplication
             {
                 //last host goes home => always zero distance
                 var distance = DistanceBetweenGeoLocations(groep.Host.GeoLong, groep.Host.GeoLat, groep.Host.GeoLong, groep.Host.GeoLat);
-                Debug.WriteLine(distance);
                 paths[groep.Host].Add(new PathData()
                 {
                     Long = groep.Host.GeoLong,
@@ -456,16 +528,21 @@ namespace WalkingDinnerWebApplication
             return list;
         }
 
-        private EventSchema CreateSchemaFromPlan(EventPlan plan)
+        private EventSchema CreateSchemaFromPlan(EventPlan plan, PostcodeGeoLocationCache geoloc)
         {
             //sanity-check which should never be triggered
             if (plan.IngeschrevenDuos.Count != plan.AantalDeelnemers || plan.AantalGroepen * plan.AantalDuosPerGroep != plan.AantalDeelnemers)
                 throw new InvalidOperationException();
 
-            //TODO: implement plan-orders
-            var geoloc = RandomGeoLocation();
+            //TODO: implement custom plan-orders
             var result = new EventSchema()
             {
+                AantalDeelnemers = plan.AantalDeelnemers,
+                AantalGangen = plan.AantalGangen,
+                AantalGroepen = plan.AantalGroepen,
+                AantalDuosPerGroep = plan.AantalDuosPerGroep,
+                Naam = plan.Naam,
+
                 VerzamelAdres = $"{geoloc.Straat} {geoloc.NummerMin}, {geoloc.Stad}",
                 VerzamelDatum = DateTime.Now,
                 VerzamelLocatieLong = geoloc.GeoLong,
@@ -485,9 +562,15 @@ namespace WalkingDinnerWebApplication
                                 .ToList();
 
             //duos = CircularList<Duo>(duos);
-            duos = ShuffleList<Duo>(duos, 0, duos.Count / plan.AantalDuosPerGroep*2, dice.Next(duos.Count / plan.AantalDuosPerGroep));
-            duos = ShuffleList<Duo>(duos, dice.Next(duos.Count), duos.Count, dice.Next(duos.Count));
+            duos = ShuffleList<Duo>(duos, 0, plan.AantalGroepen, dice.Next(plan.AantalGroepen));
+            duos = ShuffleList<Duo>(duos, plan.AantalGroepen, plan.AantalGroepen*2, dice.Next(plan.AantalGroepen));
+            if (plan.AantalDuosPerGroep >= 3)
+                duos = ShuffleList<Duo>(duos, plan.AantalGroepen* plan.AantalGangen, plan.AantalGroepen*plan.AantalDuosPerGroep, 
+                                        dice.Next(plan.AantalGroepen * (plan.AantalDuosPerGroep-plan.AantalGangen))
+                        );
             
+            //duos = ShuffleList<Duo>(duos, dice.Next(duos.Count), duos.Count, dice.Next(duos.Count));
+
             //var duos = ShuffleList<Duo>(plan.IngeschrevenDuos.ToList(), 0, plan.IngeschrevenDuos.Count, plan.IngeschrevenDuos.Count);
 
             //arrange duos in 2d-matrix van [AantalGroepen x AantalDuosPerGroep]
@@ -610,7 +693,7 @@ namespace WalkingDinnerWebApplication
             }
             return result;
         }
-
+        
         private void PrintSchema(EventSchema schema)
         {
             foreach(var gang in schema.Gangen)

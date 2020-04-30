@@ -15,6 +15,12 @@ namespace WalkingDinnerWebApplication.ViewModels
     public class MapViewModel
     {
         //Schema-Data
+        public int AantalDeelnemers { get; set; }
+        public int AantalGangen { get; set; }
+        public int AantalGroepen { get; set; }
+        public int AantalDuosPerGroep { get; set; }
+        public string Naam { get; set; }
+
         public DateTime VerzamelDatum { get; set; }
         public float VerzamelLocatieLong { get; set; }
         public float VerzamelLocatieLat { get; set; }

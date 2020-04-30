@@ -24,9 +24,11 @@ namespace WalkingDinnerWebApplication.Models
         [MaxLength(5)]//nummerType is null -> Postcode gereserveert voor PostbusAdressen
         public string NummerType { get; set; }
 
+        [Index]
         [Required]
         public float GeoLong { get; set; }
 
+        [Index]
         [Required]
         public float GeoLat { get; set; }
 

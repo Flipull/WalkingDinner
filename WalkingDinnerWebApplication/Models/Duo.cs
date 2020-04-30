@@ -14,8 +14,12 @@ namespace WalkingDinnerWebApplication.Models
         public string PostCode { get; set; }
 
         [Required]
-        [MaxLength(64)]
-        public string Adres { get; set; }
+        [MaxLength(32)]
+        public string Stad { get; set; }
+        
+        [Required]
+        [MaxLength(48)]
+        public string Straat { get; set; }
 
         [Required]
         public int Huisnummer { get; set; }

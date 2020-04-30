@@ -14,24 +14,30 @@ namespace WalkingDinnerWebApplication.Controllers
         public ActionResult Index()
         {
             var context = new WalkingDinnerContext();
+
             /*
             //TESTCODE
             for (int i = 0; i < 250; i++)
                 context.CreateRandomDuo();
-            */
-            /*
-            for (int i = 0; i < 50; i++)
+            
+
+            for (int i = 0; i < 100; i++)
             {
-                var duos = context.SelectRandomDuos(dice.Next(8, Math.Min(100, context.Duos.Count()) ));
+                var rand_choice = dice.Next(10, 99).ToString();
+                var duos = context.Duos.Where(d => d.PostCode.StartsWith(rand_choice))//split duos in regions to show 'more real' scenarios
+                                        .Take(dice.Next(8,128) )
+                                        .ToList();
+
+                //var duos = context.SelectRandomDuos(dice.Next(8, Math.Min(64, context.Duos.Count()) ));
                 context.CreateRandomPlan(duos);
             }
-            */
-            /*
-            for (int i = 0; i < 10; i++)
+
+            for (int i = 0; i < 50; i++)
             {
                 var nieuwschema = context.BruteForceSchemaSalesmanProblem(context.EventPlannen.First());
             }
             */
+
             context.Dispose();
             return View();
         }

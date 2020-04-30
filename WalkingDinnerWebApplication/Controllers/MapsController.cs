@@ -17,19 +17,25 @@ namespace WalkingDinnerWebApplication.Controllers
 
             var context = new WalkingDinnerContext();
 
-            var any_schema = context.EventSchemas
+            var schema = context.EventSchemas
                                     .Where(s => s.Id == id)
                                     .FirstOrDefault();
-            if (any_schema == null)
+            if (schema == null)
                 return HttpNotFound();
             
-            var pathing = context.CalculateSchemaPathing(any_schema);
+            var pathing = context.CalculateSchemaPathing(schema);
             
             MapViewModel vm = new MapViewModel()
             {
-                DuoData = pathing
+                DuoData = pathing,
+                AantalDeelnemers = schema.AantalDeelnemers,
+                AantalGangen = schema.AantalGangen,
+                AantalGroepen = schema.AantalGroepen,
+                AantalDuosPerGroep = schema.AantalDuosPerGroep,
+                Naam = schema.Naam,
             };
 
+            context.Dispose();
             return View(vm);
         }
     }

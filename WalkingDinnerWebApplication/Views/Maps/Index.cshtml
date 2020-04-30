@@ -75,14 +75,27 @@
                 }
             }
         }
-
+        
         // Initialize and add the map
         function initMap() {
             // The map
             var center_NL = new google.maps.LatLng(52.1076,5.34322);
             var map = new google.maps.Map(
                 document.getElementById('map'), { zoom: 7, center: center_NL });
+
             BuildPaths(map);
+
+            var markerBounds = new google.maps.LatLngBounds();
+            
+            Object.keys(markers).forEach((k) => {
+                console.log(markers[k]);
+                markerBounds.extend(markers[k].position);
+            });
+
+            setTimeout(() => {
+                
+                map.fitBounds(markerBounds);
+            }, 1000);
         }
     </script>
 
@@ -99,3 +112,25 @@
     <script async defer
             src="https://maps.googleapis.com/maps/api/js?key=AIzaSyARQfGWV2SmQh1Zk1Qu1frhIJOR_Eq1DcE&callback=initMap">
     </script>
+    <div>
+        <span style="margin-right: 20px;">
+            @Html.DisplayNameFor(model => model.AantalDeelnemers):
+            @Html.DisplayFor(model => model.AantalDeelnemers)
+        </span>
+        <span style="margin-right: 20px;">
+            @Html.DisplayNameFor(model => model.AantalGroepen):
+            @Html.DisplayFor(model => model.AantalGroepen)
+        </span>
+        <span style="margin-right: 20px;">
+            @Html.DisplayNameFor(model => model.AantalDuosPerGroep):
+            @Html.DisplayFor(model => model.AantalDuosPerGroep)
+        </span>
+        <span style="margin-right: 20px;">
+            @Html.DisplayNameFor(model => model.Naam):
+            @Html.DisplayFor(model => model.Naam)
+        </span>
+        <span style="margin-right: 20px;">
+            @Html.DisplayNameFor(model => model.AantalGangen):
+            @Html.DisplayFor(model => model.AantalGangen)
+        </span>
+    </div>

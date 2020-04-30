@@ -20,6 +20,7 @@ namespace WalkingDinnerWebApplication.Models
         
 
         [Required]
+        [MaxLength(64)]
         public string Naam { get; set; }
 
         

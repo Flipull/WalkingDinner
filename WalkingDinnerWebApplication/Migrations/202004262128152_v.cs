@@ -3,7 +3,7 @@
     using System;
     using System.Data.Entity.Migrations;
     
-    public partial class v1 : DbMigration
+    public partial class v : DbMigration
     {
         public override void Up()
         {
@@ -13,7 +13,8 @@
                     {
                         Id = c.Int(nullable: false, identity: true),
                         PostCode = c.String(nullable: false, maxLength: 6),
-                        Adres = c.String(nullable: false, maxLength: 64),
+                        Stad = c.String(nullable: false, maxLength: 32),
+                        Straat = c.String(nullable: false, maxLength: 48),
                         Huisnummer = c.Int(nullable: false),
                         GeoLong = c.Single(nullable: false),
                         GeoLat = c.Single(nullable: false),
@@ -53,6 +54,11 @@
                 c => new
                     {
                         Id = c.Int(nullable: false, identity: true),
+                        AantalDeelnemers = c.Int(nullable: false),
+                        AantalGangen = c.Int(nullable: false),
+                        AantalGroepen = c.Int(nullable: false),
+                        AantalDuosPerGroep = c.Int(nullable: false),
+                        Naam = c.String(nullable: false, maxLength: 64),
                         VerzamelDatum = c.DateTime(nullable: false),
                         VerzamelLocatieLong = c.Single(nullable: false),
                         VerzamelLocatieLat = c.Single(nullable: false),
@@ -70,7 +76,7 @@
                         AantalGangen = c.Int(nullable: false),
                         AantalGroepen = c.Int(nullable: false),
                         AantalDuosPerGroep = c.Int(nullable: false),
-                        Naam = c.String(nullable: false),
+                        Naam = c.String(nullable: false, maxLength: 64),
                     })
                 .PrimaryKey(t => t.Id);
             
@@ -91,7 +97,9 @@
                         Straat = c.String(nullable: false, maxLength: 48),
                     })
                 .PrimaryKey(t => t.Id)
-                .Index(t => t.Postcode);
+                .Index(t => t.Postcode)
+                .Index(t => t.GeoLong)
+                .Index(t => t.GeoLat);
             
             CreateTable(
                 "dbo.DuoGroeps",
@@ -134,6 +142,8 @@
             DropIndex("dbo.EventPlanDuos", new[] { "EventPlan_Id" });
             DropIndex("dbo.DuoGroeps", new[] { "Groep_Id" });
             DropIndex("dbo.DuoGroeps", new[] { "Duo_Id" });
+            DropIndex("dbo.PostcodeGeoLocationCaches", new[] { "GeoLat" });
+            DropIndex("dbo.PostcodeGeoLocationCaches", new[] { "GeoLong" });
             DropIndex("dbo.PostcodeGeoLocationCaches", new[] { "Postcode" });
             DropIndex("dbo.Gangs", new[] { "Schema_Id" });
             DropIndex("dbo.Groeps", new[] { "Host_Id" });

@@ -132,11 +132,11 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="ViewModels\MapViewModel.cs" />
-    <Compile Include="Migrations\202004242129370_v1.cs" />
-    <Compile Include="Migrations\202004242129370_v1.designer.cs">
-      <DependentUpon>202004242129370_v1.cs</DependentUpon>
+    <Compile Include="Migrations\202004262128152_v.cs" />
+    <Compile Include="Migrations\202004262128152_v.designer.cs">
+      <DependentUpon>202004262128152_v.cs</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels\MapViewModel.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ApiCaller.cs" />
     <Compile Include="Models\Duo.cs" />
@@ -208,11 +208,10 @@
     <Content Include="Scripts\jquery-3.3.1.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202004242129370_v1.resx">
-      <DependentUpon>202004242129370_v1.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202004262128152_v.resx">
+      <DependentUpon>202004262128152_v.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

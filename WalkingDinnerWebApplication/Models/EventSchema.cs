@@ -6,8 +6,23 @@ namespace WalkingDinnerWebApplication.Models
 {
     public class EventSchema
     {
+
         [Key]
         public int Id { get; set; }
+
+        [Required]
+        public int AantalDeelnemers { get; set; }
+        [Required]
+        public int AantalGangen { get; set; }
+        [Required]
+        public int AantalGroepen { get; set; }
+        [Required]
+        public int AantalDuosPerGroep { get; set; }
+
+
+        [Required]
+        [MaxLength(64)]
+        public string Naam { get; set; }
 
         [Required]
         public DateTime VerzamelDatum { get; set; }
@@ -26,6 +41,5 @@ namespace WalkingDinnerWebApplication.Models
         public string VerzamelPostcode { get; set; }
 
         virtual public ICollection<Gang> Gangen { get; set; } = new HashSet<Gang>();
-
     }
 }
