@@ -1,58 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.Entity;
-using System.Diagnostics;
 using System.Linq;
 using System.Web;
 using WalkingDinnerWebApplication.Models;
 using WalkingDinnerWebApplication.ViewModels;
 
-namespace WalkingDinnerWebApplication
+namespace WalkingDinnerWebApplication.DAL
 {
-    public class WalkingDinnerContext : DbContext
+    public class DatabaseSeed
     {
-        public WalkingDinnerContext() :
-            base("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=WalkingDinner;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False")
+        public DatabaseSeed(WalkingDinnerContext context)
         {
+            db = context;
         }
 
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Duo>()
-                .HasMany<Groep>(d => d.GeplandeEventGroepen)
-                .WithMany(g => g.Gasten);
-            modelBuilder.Entity<Groep>()
-                .HasRequired<Gang>(g => g.Gang)
-                .WithMany(g => g.Groepen)
-                .WillCascadeOnDelete(true);
-            modelBuilder.Entity<Gang>()
-                .HasRequired<EventSchema>(g => g.Schema)
-                .WithMany(s => s.Gangen)
-                .WillCascadeOnDelete(true);
-
-            base.OnModelCreating(modelBuilder);
-        }
-        
-        public DbSet<Duo> Duos { get; set; }
-        public DbSet<EventPlan> EventPlannen { get; set; }
-        public DbSet<EventSchema> EventSchemas { get; set; }
-        public DbSet<Gang> Gangen { get; set; }
-        public DbSet<Groep> Groepen { get; set; }
-
-
-
-        public DbSet<PostcodeGeoLocationCache> PostcodeGeoLocationCaches { get; set; }
-
+        private WalkingDinnerContext db;
 
         private Random dice = new Random();
         private int _CACHECOUNT = 0;
         public PostcodeGeoLocationCache RandomGeoLocation()
         {
             if (_CACHECOUNT == 0)
-                _CACHECOUNT = this.Database.SqlQuery<int>("select count(*) from PostcodeGeoLocationCaches").First();
+                _CACHECOUNT = db.Database.SqlQuery<int>("select count(*) from PostcodeGeoLocationCaches").First();
             //TODO: stop hanging when you forgot to fill the database-table
             PostcodeGeoLocationCache loc = null;
-            loc = PostcodeGeoLocationCaches.OrderBy(p => p.Id)
+            loc = db.PostcodeGeoLocationCaches.OrderBy(p => p.Id)
                                             .Skip(dice.Next(0, _CACHECOUNT))
                                             .Take(1).First();
             return loc;
@@ -60,15 +32,15 @@ namespace WalkingDinnerWebApplication
         public PostcodeGeoLocationCache PostcodeToGeoLocation(string postcode, int home_nr)
         {
             //if cached data exists, return it
-            var caches = PostcodeGeoLocationCaches
-                    .Where(o => o.Postcode == postcode.ToUpper() && 
+            var caches = db.PostcodeGeoLocationCaches
+                    .Where(o => o.Postcode == postcode.ToUpper() &&
                                 o.NummerMin <= home_nr && o.NummerMax >= home_nr &&
                                 (
                                     (o.NummerType == "mixed") ||
-                                    (o.NummerType == "even" && home_nr%2==0) ||
-                                    (o.NummerType == "odd" && home_nr%2 == 1)
+                                    (o.NummerType == "even" && home_nr % 2 == 0) ||
+                                    (o.NummerType == "odd" && home_nr % 2 == 1)
                                 )
-                                
+
                             ).ToList();
 
             if (caches.Count == 0)
@@ -113,21 +85,21 @@ namespace WalkingDinnerWebApplication
                     .Replace("akker", "")
                     .Trim();
             newduo.Naam = naam;
-            var huisnr = dice.Next(0, geoloc.NummerMax- geoloc.NummerMin) /2*2 + geoloc.NummerMin;//select an even number in range
+            var huisnr = dice.Next(0, geoloc.NummerMax - geoloc.NummerMin) / 2 * 2 + geoloc.NummerMin;//select an even number in range
             if (geoloc.NummerType == "odd")
                 huisnr += 1;//set uneven when necessary
             huisnr = Math.Max(geoloc.NummerMin, Math.Min(geoloc.NummerMax, huisnr));
-            
+
             newduo.Huisnummer = huisnr;
-            
-            Duos.Add(newduo);
-            SaveChanges();
+
+            db.Duos.Add(newduo);
+            db.SaveChanges();
             return newduo;
         }
 
         public ICollection<Duo> SelectRandomDuos(int amount)
         {
-            var duolist = Duos.ToList();
+            var duolist = db.Duos.ToList();
 
             if (amount > duolist.Count)
                 amount = duolist.Count;
@@ -150,14 +122,14 @@ namespace WalkingDinnerWebApplication
             var stramienen = EventStramien.CreateMogelijkStramien(duos.Count);
             if (stramienen.Count == 0)
                 return null;
-            
-            var gekozen_stramien = stramienen[Math.Max(0 ,dice.Next(0,stramienen.Count+1)-1)];
-            
+
+            var gekozen_stramien = stramienen[Math.Max(0, dice.Next(0, stramienen.Count + 1) - 1)];
+
             var plan = new EventPlan()
             {
-                Naam = "Grappige Naam voor een Eentje",
+                Naam = "Grappige Naam voor een Eventje",
                 AantalDeelnemers = duos.Count,
-                AantalGangen = dice.Next(EventStramien.MIN_GANGEN,gekozen_stramien.MaxGangen+1),
+                AantalGangen = dice.Next(EventStramien.MIN_GANGEN, gekozen_stramien.MaxGangen + 1),
                 AantalGroepen = gekozen_stramien.Groepen,
                 AantalDuosPerGroep = gekozen_stramien.Groepgrootte
             };
@@ -167,8 +139,8 @@ namespace WalkingDinnerWebApplication
                 plan.IngeschrevenDuos.Add(duo);
             }
 
-            EventPlannen.Add(plan);
-            SaveChanges();
+            db.EventPlannen.Add(plan);
+            db.SaveChanges();
             return plan;
         }
 
@@ -183,7 +155,7 @@ namespace WalkingDinnerWebApplication
             {
                 for (int y = 0; y < h; y++)
                 {
-                    matrix[x, y] = items[y  + x * h];
+                    matrix[x, y] = items[y + x * h];
                 }
             }
             return matrix;
@@ -205,7 +177,7 @@ namespace WalkingDinnerWebApplication
             }
             return matrix;
         }
-        
+
         private PostcodeGeoLocationCache GeoLocationToCache(float lng, float lat)
         {
             PostcodeGeoLocationCache any_cache = null;
@@ -215,13 +187,13 @@ namespace WalkingDinnerWebApplication
                 .FirstOrDefault();
             */
             //optimized version for DB-indices
-            float epsilon = 1/2048f;
+            float epsilon = 1 / 2048f;
             do
             {
                 epsilon *= 2f;
-                any_cache = PostcodeGeoLocationCaches
+                any_cache = db.PostcodeGeoLocationCaches
                     .Where(c => c.GeoLong > lng - epsilon && c.GeoLong < lng + epsilon
-                            && c.GeoLat > lat - epsilon && c.GeoLat < lat + epsilon)
+                             && c.GeoLat > lat - epsilon && c.GeoLat < lat + epsilon)
                     .FirstOrDefault();
             } while (any_cache == null);
             return any_cache;
@@ -232,7 +204,7 @@ namespace WalkingDinnerWebApplication
             var total = duos.Count;
             float long_sum = 0;
             float lat_sum = 0;
-            foreach(var duo in duos)
+            foreach (var duo in duos)
             {
                 long_sum += duo.GeoLong;
                 lat_sum += duo.GeoLat;
@@ -245,7 +217,7 @@ namespace WalkingDinnerWebApplication
             do
             {
                 epsilon *= 1.5f;
-                any_cache = PostcodeGeoLocationCaches
+                any_cache = db.PostcodeGeoLocationCaches
                     .Where(c => c.GeoLong > long_avg - epsilon && c.GeoLong < long_avg + epsilon
                             && c.GeoLat > lat_avg - epsilon && c.GeoLat < lat_avg + epsilon)
                     .FirstOrDefault();
@@ -273,17 +245,17 @@ namespace WalkingDinnerWebApplication
             for (int i = 0; i < 250; i++)
             {
                 var new_schema = CreateSchemaFromPlan(plan, meetingloc);
-                
+
                 var paths = CalculateSchemaPathing(new_schema);
                 var travel_dist = CalculatePathMapTravelDistance(paths);
-                
+
                 if (travel_dist < shortest_travel)
                 {
                     shortest_travel = travel_dist;
                     schema = new_schema;
                     epsilon += 0.05;
                 }
-                else if (travel_dist/shortest_travel > epsilon)//threshold to change meetingloc
+                else if (travel_dist / shortest_travel > epsilon)//threshold to change meetingloc
                 {
                     //meetingloc = RandomGeoLocation();
                     rand_long = (float)dice.NextDouble() * (long_max - long_min) + long_min;
@@ -297,10 +269,10 @@ namespace WalkingDinnerWebApplication
                     //System.Diagnostics.Debug.WriteLine(travel_dist / shortest_travel);
                 }
             }
-            
-            EventPlannen.Remove(plan);
-            EventSchemas.Add(schema);
-            SaveChanges();
+
+            db.EventPlannen.Remove(plan);
+            db.EventSchemas.Add(schema);
+            db.SaveChanges();
             return schema;
         }
 
@@ -329,7 +301,7 @@ namespace WalkingDinnerWebApplication
                         Lat = gast.GeoLat,
                         Distance = 0
                     };
-                    paths.Add(gast, new List<PathData>() { duopathdata } );
+                    paths.Add(gast, new List<PathData>() { duopathdata });
                 }
             }
 
@@ -445,7 +417,7 @@ namespace WalkingDinnerWebApplication
                     }
                 }
             }
-            
+
             //ieder individu rijd naar huis
             var laatste_gang = gangen[gangen.Count - 1];
             foreach (var groep in laatste_gang.Groepen)
@@ -477,13 +449,13 @@ namespace WalkingDinnerWebApplication
         {
             double distance = 0;
             //voor elke duo, bereken de afstanden van zijn path
-            foreach(var item in pathmap)
+            foreach (var item in pathmap)
             {
                 //squared-distance(weight) == distance weighs heavier; evens out distances between duos
 
                 var travel_items = item.Value;//.GetRange(1, item.Value.Count-2);
-                distance += Math.Pow(travel_items.Sum(p => p.Distance),2);
-                if (double.IsNaN(distance) )
+                distance += Math.Pow(travel_items.Sum(p => p.Distance), 2);
+                if (double.IsNaN(distance))
                 {
                     Console.WriteLine("!!!");
                 }
@@ -497,8 +469,8 @@ namespace WalkingDinnerWebApplication
             var count = list.Count;
             int returncircle_start = (count % 2 == 1 ? 1 : 0);
             List<T> result = new List<T>();
-            
-            for (int i = count-1; i >= 0; i = i - 2)
+
+            for (int i = count - 1; i >= 0; i = i - 2)
             {
                 result.Add(list[i]);
             }
@@ -563,19 +535,19 @@ namespace WalkingDinnerWebApplication
 
             //duos = CircularList<Duo>(duos);
             duos = ShuffleList<Duo>(duos, 0, plan.AantalGroepen, dice.Next(plan.AantalGroepen));
-            duos = ShuffleList<Duo>(duos, plan.AantalGroepen, plan.AantalGroepen*2, dice.Next(plan.AantalGroepen));
+            duos = ShuffleList<Duo>(duos, plan.AantalGroepen, plan.AantalGroepen * 2, dice.Next(plan.AantalGroepen));
             if (plan.AantalDuosPerGroep >= 3)
-                duos = ShuffleList<Duo>(duos, plan.AantalGroepen* plan.AantalGangen, plan.AantalGroepen*plan.AantalDuosPerGroep, 
-                                        dice.Next(plan.AantalGroepen * (plan.AantalDuosPerGroep-plan.AantalGangen))
+                duos = ShuffleList<Duo>(duos, plan.AantalGroepen * plan.AantalGangen, plan.AantalGroepen * plan.AantalDuosPerGroep,
+                                        dice.Next(plan.AantalGroepen * (plan.AantalDuosPerGroep - plan.AantalGangen))
                         );
-            
+
             //duos = ShuffleList<Duo>(duos, dice.Next(duos.Count), duos.Count, dice.Next(duos.Count));
 
             //var duos = ShuffleList<Duo>(plan.IngeschrevenDuos.ToList(), 0, plan.IngeschrevenDuos.Count, plan.IngeschrevenDuos.Count);
 
             //arrange duos in 2d-matrix van [AantalGroepen x AantalDuosPerGroep]
             var duos_2d = ArrayToMatrix<Duo>(duos, plan.AantalGroepen, plan.AantalDuosPerGroep);
-            
+
             //gang 1:
             //elke groep bestaat uit verticale slices van de matrix 
             var gang1 = new Gang()
@@ -588,7 +560,7 @@ namespace WalkingDinnerWebApplication
                 var groep = new Groep();
                 for (int d = 0; d < plan.AantalDuosPerGroep; d++)
                 {
-                    if (d==0)
+                    if (d == 0)
                         groep.Host = duos_2d[g, d];
                     else
                         groep.Gasten.Add(duos_2d[g, d]);
@@ -693,10 +665,10 @@ namespace WalkingDinnerWebApplication
             }
             return result;
         }
-        
+
         private void PrintSchema(EventSchema schema)
         {
-            foreach(var gang in schema.Gangen)
+            foreach (var gang in schema.Gangen)
             {
                 System.Diagnostics.Debug.WriteLine("---");
                 foreach (var groep in gang.Groepen)
@@ -713,9 +685,9 @@ namespace WalkingDinnerWebApplication
 
         private float AnglesToRadians(float angle)
         {
-            return (float) (angle / 180f * Math.PI);
+            return (float)(angle / 180f * Math.PI);
         }
-        private float DistanceBetweenGeoLocations(float long1, float lat1, float long2, float lat2) 
+        private float DistanceBetweenGeoLocations(float long1, float lat1, float long2, float lat2)
         {
             var long1_rad = AnglesToRadians(long1);
             var lat1_rad = AnglesToRadians(lat1);
@@ -733,12 +705,12 @@ namespace WalkingDinnerWebApplication
             float r = 6_371_000f;
             var delta_long = long2_rad - long1_rad;
             var delta_lat = lat2_rad - lat1_rad;
-            
-            var a = Math.Pow(Math.Sin(delta_lat / 2), 2) + 
+
+            var a = Math.Pow(Math.Sin(delta_lat / 2), 2) +
                     Math.Cos(lat1_rad) * Math.Cos(lat2_rad) * Math.Pow(Math.Sin(delta_long / 2), 2);
             var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
-            
-            var result = (float)(r*c);
+
+            var result = (float)(r * c);
             if (float.IsNaN(result)) throw new DivideByZeroException();
             return result;
         }
@@ -746,7 +718,7 @@ namespace WalkingDinnerWebApplication
         private Groep FindDuoGroepInGang(Gang gang, Duo duo)
         {
             var groepen = gang.Groepen.ToList();
-            for (int g=0; g < groepen.Count; g++)
+            for (int g = 0; g < groepen.Count; g++)
             {
                 if (groepen[g].Host == duo ||
                     groepen[g].Gasten.Contains(duo))
@@ -796,5 +768,4 @@ namespace WalkingDinnerWebApplication
             return stramienen;
         }
     }
-
 }

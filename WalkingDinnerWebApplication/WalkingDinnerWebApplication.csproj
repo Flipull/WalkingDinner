@@ -127,18 +127,22 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\EventSchemaController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\MapsController.cs" />
+    <Compile Include="DAL\DatabaseSeed.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202004262128152_v.cs" />
-    <Compile Include="Migrations\202004262128152_v.designer.cs">
-      <DependentUpon>202004262128152_v.cs</DependentUpon>
-    </Compile>
+    <Compile Include="ModelMappingExtensions\DuoExtensions.cs" />
+    <Compile Include="ModelMappingExtensions\EventPlanExtensions.cs" />
+    <Compile Include="ModelMappingExtensions\EventSchemaExtensions.cs" />
+    <Compile Include="Models\PathData.cs" />
+    <Compile Include="ViewModels\DuoViewModels.cs" />
+    <Compile Include="ViewModels\EventPlanViewModel.cs" />
+    <Compile Include="ViewModels\EventSchemaViewModel.cs" />
     <Compile Include="ViewModels\MapViewModel.cs" />
     <Compile Include="Migrations\Configuration.cs" />
-    <Compile Include="Models\ApiCaller.cs" />
     <Compile Include="Models\Duo.cs" />
     <Compile Include="Models\EventPlan.cs" />
     <Compile Include="Models\EventSchema.cs" />
@@ -146,7 +150,7 @@
     <Compile Include="Models\Groep.cs" />
     <Compile Include="Models\PostcodeGeoLocationCache.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WalkingDinnerContext.cs" />
+    <Compile Include="DAL\WalkingDinnerContext.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Data\dbo.PostcodeGeoLocationCaches.data_1.sql" />
@@ -189,10 +193,13 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="Views\Home\About.cshtml" />
-    <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Maps\Index.cshtml" />
+    <Content Include="Views\Duo\Details.cshtml" />
+    <Content Include="Views\EventPlan\Details.cshtml" />
+    <Content Include="Views\EventPlan\Create.cshtml" />
+    <Content Include="Views\EventSchema\Details.cshtml" />
+    <Content Include="Views\Duo\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />
@@ -206,11 +213,6 @@
     <None Include="packages.config" />
     <Content Include="Scripts\jquery-3.3.1.slim.min.map" />
     <Content Include="Scripts\jquery-3.3.1.min.map" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Migrations\202004262128152_v.resx">
-      <DependentUpon>202004262128152_v.cs</DependentUpon>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Views\DbImport\" />

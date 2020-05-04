@@ -21,7 +21,7 @@ namespace WalkingDinnerWebApplication.Models
         [Required]
         public int NummerMax { get; set; }
         
-        [MaxLength(5)]//nummerType is null -> Postcode gereserveert voor PostbusAdressen
+        [MaxLength(5)] // nummerType is null -> Postcode gereserveerd voor PostbusAdressen
         public string NummerType { get; set; }
 
         [Index]

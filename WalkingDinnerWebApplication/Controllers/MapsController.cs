@@ -3,27 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using WalkingDinnerWebApplication.DAL;
 using WalkingDinnerWebApplication.ViewModels;
 
 namespace WalkingDinnerWebApplication.Controllers
 {
     public class MapsController : Controller
     {
-        // GET: Maps
+        WalkingDinnerContext db = new WalkingDinnerContext();
+
+        // GET: Maps/Index/{id}
         public ActionResult Index(uint? id)
         {
-            if (id ==null)
+            if (id == null)
                 return HttpNotFound();
 
-            var context = new WalkingDinnerContext();
-
-            var schema = context.EventSchemas
+            var schema = db.EventSchemas
                                     .Where(s => s.Id == id)
                                     .FirstOrDefault();
             if (schema == null)
                 return HttpNotFound();
-            
-            var pathing = context.CalculateSchemaPathing(schema);
+
+            var seed = new DatabaseSeed(db);
+            var pathing = seed.CalculateSchemaPathing(schema);
             
             MapViewModel vm = new MapViewModel()
             {
@@ -35,7 +37,9 @@ namespace WalkingDinnerWebApplication.Controllers
                 Naam = schema.Naam,
             };
 
-            context.Dispose();
+            // TODO: Read https://blog.jongallant.com/2012/10/do-i-have-to-call-dispose-on-dbcontext/
+            // db.Dispose();
+
             return View(vm);
         }
     }
