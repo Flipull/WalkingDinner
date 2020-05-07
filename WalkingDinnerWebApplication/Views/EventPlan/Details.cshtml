@@ -22,3 +22,18 @@
 @Html.LabelFor(p => p.AantalDuosPerGroep)
 @Html.DisplayTextFor(p => p.AantalDuosPerGroep)
 
+@using (Html.BeginForm("Cancel", "EventPlan", FormMethod.Post))
+{
+    <fieldset>
+        <input type="hidden" name="id" value="@Model.Id" />
+        <button type="submit">Annuleer Plan</button>
+    </fieldset>
+}
+
+@using (Html.BeginForm("CreateSchema", "EventPlan", FormMethod.Post))
+{
+<fieldset>
+    <input type="hidden" name="id" value="@Model.Id" />
+    <button type="submit">Creëer Schema</button>
+</fieldset>
+}

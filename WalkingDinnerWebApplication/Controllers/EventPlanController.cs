@@ -71,5 +71,44 @@ namespace WalkingDinnerWebApplication.Controllers
             else
                 return RedirectToAction("Details", new { id = plan.Id } );
         }
+
+        [HttpPost]
+        public ActionResult Cancel(int? id)
+        {
+            if (id == null)
+                return HttpNotFound();
+
+            var plan = db.EventPlannen.Find((int)id);
+            if (plan == null)
+                return HttpNotFound();
+
+            db.EventPlannen.Remove(plan);
+            db.SaveChanges();
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public ActionResult CreateSchema(int? id)
+        {
+            if (id == null)
+                return HttpNotFound();
+
+            var plan = db.EventPlannen.Find((int)id);
+            if (plan == null)
+                return HttpNotFound();
+
+            if (plan.AantalDeelnemers != plan.IngeschrevenDuos.Count)
+                return RedirectToAction("Details", new { id = id });
+
+            var engine = new DatabaseSeed(db);
+
+            var schema = engine.BruteForceSchemaSalesmanProblem(plan);
+
+            if (schema == null)
+                return HttpNotFound();
+            
+            return RedirectToAction("Details","EventSchema", new { id = schema.Id });
+        }
+
     }
 }
