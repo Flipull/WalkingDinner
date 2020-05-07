@@ -129,7 +129,6 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\EventSchemaController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\MapsController.cs" />
     <Compile Include="DAL\DatabaseSeed.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -139,9 +138,8 @@
     <Compile Include="ModelMappingExtensions\EventSchemaExtensions.cs" />
     <Compile Include="Models\PathData.cs" />
     <Compile Include="ViewModels\DuoViewModels.cs" />
-    <Compile Include="ViewModels\EventPlanViewModel.cs" />
-    <Compile Include="ViewModels\EventSchemaViewModel.cs" />
-    <Compile Include="ViewModels\MapViewModel.cs" />
+    <Compile Include="ViewModels\EventPlanViewModels.cs" />
+    <Compile Include="ViewModels\EventSchemaViewModels.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Duo.cs" />
     <Compile Include="Models\EventPlan.cs" />
@@ -169,6 +167,7 @@
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
     <Content Include="Content\Site.css" />
+    <Content Include="Images\JumboBG.jpg" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
@@ -194,12 +193,12 @@
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Views\Maps\Index.cshtml" />
     <Content Include="Views\Duo\Details.cshtml" />
     <Content Include="Views\EventPlan\Details.cshtml" />
     <Content Include="Views\EventPlan\Create.cshtml" />
     <Content Include="Views\EventSchema\Details.cshtml" />
     <Content Include="Views\Duo\Edit.cshtml" />
+    <Content Include="Views\EventSchema\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff2" />

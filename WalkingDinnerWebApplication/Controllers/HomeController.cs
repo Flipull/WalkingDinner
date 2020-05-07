@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Mvc;
 using WalkingDinnerWebApplication.DAL;
 using WalkingDinnerWebApplication.Migrations;
+using WalkingDinnerWebApplication.ViewModels;
 
 namespace WalkingDinnerWebApplication.Controllers
 {
@@ -15,6 +16,11 @@ namespace WalkingDinnerWebApplication.Controllers
 
         public ActionResult Index()
         {
+            EventPlanIndexViewModel viewModel = new EventPlanIndexViewModel
+            {
+                EventPlans = db.EventPlannen.ToList()
+            };
+
             /*
             //TESTCODE
             var seedData = new DatabaseSeed(db);
@@ -41,7 +47,7 @@ namespace WalkingDinnerWebApplication.Controllers
             }
             */
 
-            return View();
+            return View(viewModel);
         }
 
         public ActionResult ImportDb()

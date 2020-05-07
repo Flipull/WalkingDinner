@@ -128,7 +128,7 @@
         </dl>
     </div>
 
-    <button style="margin:20px">Print PDF</button>
+    <button class="btn-default" style="margin:20px">Print PDF</button>
 </div>
 
 <div class="row">
@@ -138,7 +138,7 @@
         <table class="table-bordered">
             <thead>
                 <tr>
-                    <th>
+                    <th width="60px">
 
                     </th>
                     @for (int i = 1; i <= Model.AantalGroepenPerGang; i++)
@@ -155,7 +155,7 @@
                 {
                     <tr>
                         <td>
-                            Gang @gang.GangNummer.ToString()
+                            <b>Gang @gang.GangNummer.ToString()</b>
                         </td>
                         @foreach (var groep in gang.Groepen)
                         {

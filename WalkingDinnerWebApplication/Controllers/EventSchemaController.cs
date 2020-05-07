@@ -15,6 +15,16 @@ namespace WalkingDinnerWebApplication.Controllers
     {
         WalkingDinnerContext db = new WalkingDinnerContext();
 
+        public ActionResult Index()
+        {
+            EventSchemaIndexViewModel viewModel = new EventSchemaIndexViewModel
+            {
+                EventSchemas = db.EventSchemas.ToList()
+            };
+
+            return View(viewModel);
+        }
+
         // GET: EventSchema/Details/{id}
         public ActionResult Details(int? id)
         {
