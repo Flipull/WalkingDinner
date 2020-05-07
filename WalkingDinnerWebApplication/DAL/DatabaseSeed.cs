@@ -117,6 +117,35 @@ namespace WalkingDinnerWebApplication.DAL
             return selected_duos;
         }
 
+        /// <summary>
+        /// new EventPlan (autosaved to Db!)
+        /// </summary>
+        /// <param name="aantal_duos"></param>
+        /// <param name="aantal_groepen"></param>
+        /// <param name="aantal_duospergroep"></param>
+        /// <param name="aantal_gangen"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        public EventPlan CreatePlan(int aantal_duos, int aantal_duospergroep, int aantal_gangen, string name)
+        {
+            //TODO: validate data
+            if (aantal_duos % aantal_duospergroep != 0)
+                throw new InvalidOperationException();
+
+
+            var plan = new EventPlan()
+            {
+                Naam = name,
+                AantalDeelnemers = aantal_duos,
+                AantalGangen = aantal_gangen,
+                AantalGroepen = aantal_duos / aantal_duospergroep,
+                AantalDuosPerGroep = aantal_duospergroep
+            };
+            db.EventPlannen.Add(plan);
+            db.SaveChanges();
+            return plan;
+        }
+
         public EventPlan CreateRandomPlan(ICollection<Duo> duos)
         {
             var stramienen = EventStramien.CreateMogelijkStramien(duos.Count);

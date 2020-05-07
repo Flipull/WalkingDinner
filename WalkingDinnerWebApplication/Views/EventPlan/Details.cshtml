@@ -1,7 +1,24 @@
-﻿
+﻿@model WalkingDinnerWebApplication.ViewModels.EventPlanViewModel
 @{
     ViewBag.Title = "Details";
 }
 
 <h2>Details</h2>
+<br />
+<br />
+
+@Html.LabelFor(p => p.Naam)
+@Html.DisplayTextFor(p => p.Naam)
+<br />
+@Html.LabelFor(p => p.AantalDeelnemers)
+@Html.DisplayTextFor(p => p.AantalDeelnemers)
+<br />
+@Html.LabelFor(p => p.AantalGangen)
+@Html.DisplayTextFor(p => p.AantalGangen)
+<br />
+@Html.LabelFor(p => p.AantalGroepen)
+@Html.DisplayTextFor(p => p.AantalGroepen)
+<br />
+@Html.LabelFor(p => p.AantalDuosPerGroep)
+@Html.DisplayTextFor(p => p.AantalDuosPerGroep)
 

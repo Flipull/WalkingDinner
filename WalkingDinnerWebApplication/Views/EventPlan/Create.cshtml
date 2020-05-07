@@ -1,7 +1,188 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "Create";
 }
 
-<h2>Create</h2>
+<br />
+
+<style>
+    .container {
+        text-align: center;
+    }
+
+        .container > .card {
+            display: inline-block;
+            border: 1px solid black;
+            width: 25%;
+            min-height: 150px;
+            padding-top: 50px;
+        }
+
+            .container > .card:hover {
+                background-color: antiquewhite;
+            }
+</style>
+
+@section Scripts {
+    <script>
+        var stramienen = [];
+        var duospergroep = -1;
+        var aantalgangen = -1;
+        
+        function GetStramienen(aantal_duos) {
+            $.ajax({
+                method: "GET",
+                url: "/API/GetStramienen",
+                data: { duo_count: aantal_duos }
+            }).done((data) => {
+                duospergroep = -1;
+                aantalgangen = -1;
+                stramienen = data;
+                UpdateInterface()
+            });
+        }
+
+        function UpdateInterface() {
+            $(".card").hide();
+            $(".card").removeClass("bg-primary");
+            for (var i = 0; i < stramienen.length; i++) {
+                $("#duopergroep" + stramienen[i].Groepgrootte + "_block").show();
+            }
+            for (var i = 0; i < stramienen.length; i++) {
+                for (var j = 2; j <= stramienen[i].MaxGangen; j++)
+                    $("#gangen" + j + "_block").show();
+            }
+        }
+
+        function Select(duo_aantal, gang_aantal) {
+            if (gang_aantal > duo_aantal) {
+                gang_aantal = -1;
+            }
+            UpdateInterface();
+            for (var j = duo_aantal + 1; j <= 4; j++)
+                $("#gangen" + j + "_block").hide();
+            $("#duopergroep" + duo_aantal + "_block").addClass("bg-primary");
+
+            $("#gangen" + gang_aantal + "_block").addClass("bg-primary");
+
+            duospergroep = duo_aantal;
+            aantalgangen = gang_aantal;
+        }
+
+        function SubmitCreation() {
+            //validate
+            if (aantalgangen == -1 || duospergroep == -1 || 
+                $("#naam").val() == "" )
+                return alert("Niet alle benodigde keuzes gemaakt!");
+
+            var form = document.createElement("form");
+            form.method = "POST";
+            form.action = "";
+            form.appendChild($("#aantal_duos").get(0) );
+            form.appendChild($("#naam").get(0) );
+
+            var element1 = document.createElement("input"); 
+            element1.value = aantalgangen;
+            element1.name="aantal_gangen";
+            form.appendChild(element1);  
+
+            var element2 = document.createElement("input");  
+            element2.value = duospergroep;
+            element2.name="aantal_duospergroep";
+            form.appendChild(element2);
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+        /*
+            function SelectDuospergroep(aantal) {
+                if (aantalgangen > aantal)
+                    aantalgangen = -1;
+                UpdateInterface();
+                duospergroep = aantal;
+                for (var j = aantal+1; j <= 4; j++)
+                    $("#gangen" + j + "_block").hide();
+                $("#duopergroep" + aantal + "_block").addClass("bg-primary");
+            }
+            function SelectGangen(aantal) {
+                UpdateInterface();
+                SelectDuospergroep(aantalgangen);
+                aantalgangen = aantal;
+                $("#gangen" + aantal + "_block").addClass(".bg-primary");
+            }
+            */
+        
+        GetStramienen($("#aantal_duos").val() );
+    </script>
+}
+
+
+<div class="container">
+    <h4>Create Etentje</h4>
+    <input id="aantal_duos" name="aantal_duos" type="number" min="0" max="250" placeholder="Aantal duo's"
+           onchange="GetStramienen(this.value)" value="36" />
+    <input id="naam" name="naam" type="text" placeholder="Naam v.h. etentje" maxlength="64" />
+    <button style="padding: 5px 10px; margin-left: 30px;" onclick="SubmitCreation()">Creëer</button>
+</div>
+
+<br />
+
+<div class="container">
+    <h4>Duo's aan tafel</h4>
+    
+    <div id="duopergroep2_block" class="card">
+        <div class="card-header"></div>
+        <div class="card-body">
+            <h3 class="card-title">2 Duo's</h3>
+            <p class="card-text"></p>
+            <button class="btn btn-primary" onclick="Select(2, aantalgangen)">Select</button>
+        </div>
+    </div>
+    <div id="duopergroep3_block" class="card">
+        <div class="card-header"></div>
+        <div class="card-body">
+            <h3 class="card-title">3 Duo's</h3>
+            <p class="card-text"></p>
+            <button class="btn btn-primary" onclick="Select(3, aantalgangen)">Select</button>
+        </div>
+    </div>
+    <div id="duopergroep4_block" class="card">
+        <div class="card-body">
+            <h3 class="card-title">4 Duo's</h3>
+            <p class="card-text"></p>
+            <button class="btn btn-primary" onclick="Select(4, aantalgangen)">Select</button>
+        </div>
+    </div>
+</div>
+
+<br />
+
+<div class="container">
+    <h4>Aantal gangen in het schuifel-diner</h4>
+
+    <div id="gangen2_block" class="card">
+        <div class="card-header"></div>
+        <div class="card-body">
+            <h3 class="card-title">2 Gangen</h3>
+            <p class="card-text"></p>
+            <button class="btn btn-primary" onclick="Select(duospergroep, 2)">Select</button>
+        </div>
+    </div>
+    <div id="gangen3_block" class="card">
+        <div class="card-header"></div>
+        <div class="card-body">
+            <h3 class="card-title">3 Gangen</h3>
+            <p class="card-text"></p>
+            <button class="btn btn-primary" onclick="Select(duospergroep, 3)">Select</button>
+        </div>
+    </div>
+    <div id="gangen4_block" class="card">
+        <div class="card-body">
+            <h3 class="card-title">4 Gangen</h3>
+            <p class="card-text"></p>
+            <button class="btn btn-primary" onclick="Select(duospergroep, 4)">Select</button>
+        </div>
+    </div>
+</div>
+
+
 
