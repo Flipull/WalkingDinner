@@ -19,21 +19,27 @@ namespace WalkingDinnerWebApplication.ModelMappingExtensions
                 Adres = $"{model.Straat} {model.Huisnummer}",
                 Stad = model.Stad,
                 EventPlannen = model.IngeschrevenPlannen
-
-                // TODO: Get all related EventSchemas from database
             };
 
-            return viewModel;
-        }
-
-        public static DuoEditViewModel ToEditViewModel(this Duo model)
-        {
-            var viewModel = new DuoEditViewModel
+            // Get EventSchemas the duo is attending
+            viewModel.EventSchemas = new List<EventSchema>();
+            foreach(var gang in db.Gangen)
             {
-                Naam = model.Naam,
-                Postcode = model.PostCode,
-                Huisnummer = model.Huisnummer
-            };
+                bool gangContainsDuo = false;
+
+                foreach(var groep in gang.Groepen)
+                {
+                    if (groep.Gasten.Contains(model))
+                    {
+                        gangContainsDuo = true;
+                    }
+                }
+
+                if (gangContainsDuo)
+                {
+                    viewModel.EventSchemas.Add(gang.Schema);
+                }
+            }
 
             return viewModel;
         }

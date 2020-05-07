@@ -127,6 +127,7 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\DuoController.cs" />
     <Compile Include="Controllers\EventSchemaController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="DAL\DatabaseSeed.cs" />
@@ -197,7 +198,6 @@
     <Content Include="Views\EventPlan\Details.cshtml" />
     <Content Include="Views\EventPlan\Create.cshtml" />
     <Content Include="Views\EventSchema\Details.cshtml" />
-    <Content Include="Views\Duo\Edit.cshtml" />
     <Content Include="Views\EventSchema\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>

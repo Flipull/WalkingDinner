@@ -6,3 +6,93 @@
 
 <h2>@ViewBag.Title</h2>
 
+<div class="row">
+    <div class="col-lg-12">
+        <dl class="dl-horizontal">
+            <dt>@Html.DisplayNameFor(model => model.Naam)</dt>
+            <dd>@Html.DisplayFor(model => model.Naam)</dd>
+
+            <dt>@Html.DisplayNameFor(model => model.Adres)</dt>
+            <dd>@Html.DisplayFor(model => model.Adres)</dd>
+
+            <dt>@Html.DisplayNameFor(model => model.Postcode)</dt>
+            <dd>@Html.DisplayFor(model => model.Postcode)</dd>
+
+            <dt>@Html.DisplayNameFor(model => model.Stad)</dt>
+            <dd>@Html.DisplayFor(model => model.Stad)</dd>
+        </dl>
+    </div>
+</div>
+
+
+<h3>Inschrijvingen</h3>
+<div class="table-responsive">
+    <table class="table table-striped table-condensed table-hover table-responsive table-bordered">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.EventPlannen.First().Naam)
+                </th>
+                <th>
+                    @*@Html.DisplayNameFor(model => model.EventPlannen.First().VerzamelDatum)*@
+                </th>
+                <th>
+                    @*@Html.DisplayNameFor(model => model.EventPlannen.First().VerzamelAdres)*@
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model.EventPlannen)
+            {
+                <tr onclick="window.location='@Url.Action("Details", "EventPlan", new { id = item.Id })'" style="cursor: pointer;">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Naam)
+                    </td>
+                    <td>
+                        @*@Html.DisplayFor(modelItem => item.VerzamelDatum)*@
+                    </td>
+                    <td>
+                        @*@Html.DisplayFor(modelItem => item.VerzamelAdres)*@
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<h3>Geplande diners</h3>
+<div class="table-responsive">
+    <table class="table table-striped table-condensed table-hover table-responsive table-bordered">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.EventSchemas.First().Naam)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.EventSchemas.First().VerzamelDatum)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.EventSchemas.First().VerzamelAdres)
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model.EventSchemas)
+            {
+                <tr onclick="window.location='@Url.Action("Details", "EventSchema", new { id = item.Id })'" style="cursor: pointer;">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Naam)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.VerzamelDatum)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.VerzamelAdres)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
