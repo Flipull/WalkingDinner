@@ -1,26 +1,30 @@
 ﻿@model WalkingDinnerWebApplication.ViewModels.EventPlanViewModel
 @{
-    ViewBag.Title = "Details";
+    ViewBag.Title = "EventPlan Details";
 }
 
-<h2>Details</h2>
-<br />
-<br />
+<h2>@ViewBag.Title</h2>
 
-@Html.LabelFor(p => p.Naam)
-@Html.DisplayTextFor(p => p.Naam)
-<br />
-@Html.LabelFor(p => p.AantalDeelnemers)
-@Html.DisplayTextFor(p => p.AantalDeelnemers)
-<br />
-@Html.LabelFor(p => p.AantalGangen)
-@Html.DisplayTextFor(p => p.AantalGangen)
-<br />
-@Html.LabelFor(p => p.AantalGroepen)
-@Html.DisplayTextFor(p => p.AantalGroepen)
-<br />
-@Html.LabelFor(p => p.AantalDuosPerGroep)
-@Html.DisplayTextFor(p => p.AantalDuosPerGroep)
+<div class="row">
+    <div class="col-lg-12">
+        <dl class="dl-horizontal">
+            <dt>@Html.DisplayNameFor(model => model.Naam)</dt>
+            <dd>@Html.DisplayFor(model => model.Naam)</dd>
+
+            <dt>@Html.DisplayNameFor(model => model.AantalDeelnemers)</dt>
+            <dd>@Html.DisplayFor(model => model.AantalDeelnemers)</dd>
+
+            <dt>@Html.DisplayNameFor(model => model.AantalGangen)</dt>
+            <dd>@Html.DisplayFor(model => model.AantalGangen)</dd>
+
+            <dt>@Html.DisplayNameFor(model => model.AantalGroepen)</dt>
+            <dd>@Html.DisplayFor(model => model.AantalGroepen)</dd>
+
+            <dt>@Html.DisplayNameFor(model => model.AantalDuosPerGroep)</dt>
+            <dd>@Html.DisplayFor(model => model.AantalDuosPerGroep)</dd>
+        </dl>
+    </div>
+</div>
 
 @using (Html.BeginForm("Cancel", "EventPlan", FormMethod.Post))
 {
@@ -32,8 +36,8 @@
 
 @using (Html.BeginForm("CreateSchema", "EventPlan", FormMethod.Post))
 {
-<fieldset>
-    <input type="hidden" name="id" value="@Model.Id" />
-    <button type="submit">Creëer Schema</button>
-</fieldset>
+    <fieldset>
+        <input type="hidden" name="id" value="@Model.Id" />
+        <button type="submit">Creëer Schema</button>
+    </fieldset>
 }
