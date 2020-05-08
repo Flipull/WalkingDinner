@@ -53,6 +53,12 @@
       <HintPath>..\packages\EntityFramework.6.4.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="PdfSharp, Version=1.50.5147.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp.1.50.5147\lib\net20\PdfSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp.Charting, Version=1.50.5147.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp.1.50.5147\lib\net20\PdfSharp.Charting.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -132,6 +138,7 @@
     <Compile Include="Controllers\EventPlanController.cs" />
     <Compile Include="Controllers\EventSchemaController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\PDFController.cs" />
     <Compile Include="DAL\DatabaseSeed.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -140,6 +147,7 @@
     <Compile Include="ModelMappingExtensions\EventPlanExtensions.cs" />
     <Compile Include="ModelMappingExtensions\EventSchemaExtensions.cs" />
     <Compile Include="Models\PathData.cs" />
+    <Compile Include="PDF Printer\PDF.cs" />
     <Compile Include="ViewModels\DuoViewModels.cs" />
     <Compile Include="ViewModels\EventPlanViewModels.cs" />
     <Compile Include="ViewModels\EventSchemaViewModels.cs" />
@@ -217,6 +225,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Views\DbImport\" />
+    <Folder Include="Views\PDF\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
