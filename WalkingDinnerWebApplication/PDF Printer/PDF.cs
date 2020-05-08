@@ -2,6 +2,7 @@
 using PdfSharp.Pdf;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Configuration;
 using System.Linq;
 using System.Web;
 using WalkingDinnerWebApplication.Models;
@@ -19,10 +20,13 @@ namespace WalkingDinnerWebApplication.PDF_Printer
             const int headerFontSize = 24;
             const int subHeaderFontSize = 18;
             const int normalFontSize = 12;
+            const int cutFontSize = 8;
 
-            XFont fontHeader = new XFont("Arial Narrow", headerFontSize, XFontStyle.BoldItalic);
+            XFont fontHeader = new XFont("Arial Narrow", headerFontSize, XFontStyle.Bold);
             XFont fontSubHeader = new XFont("Arial Narrow", subHeaderFontSize, XFontStyle.BoldItalic);
+            XFont fontItalic = new XFont("Arial Narrow", normalFontSize, XFontStyle.Italic);
             XFont fontNormal = new XFont("Arial Narrow", normalFontSize, XFontStyle.Regular);
+            XFont fontCuttingLine = new XFont("Arial", cutFontSize, XFontStyle.Regular);
 
             gfxTopPage.DrawString($"{schema.Naam}", fontHeader, XBrushes.Black,
                                   new XRect(0, 200, topPage.Width, 0), XStringFormats.Center);
@@ -37,23 +41,38 @@ namespace WalkingDinnerWebApplication.PDF_Printer
             foreach(var gang in schema.Gangen)
             {
                 gangNummer++;
-                bool isHeader = true;
+                helper.CreatePage();
 
-                // Print Gang#
+                // Draw Gang#
+                XUnit top = helper.GetLinePosition( headerFontSize + 5, headerFontSize );
+                helper.Gfx.DrawString($"Gang #{gangNummer}", fontHeader, XBrushes.Black, left, top, XStringFormats.TopLeft);
 
-                foreach(var groep in gang.Groepen)
+                foreach (var groep in gang.Groepen)
                 {
-                    // Print Host name
+                    // Do not place Hostname at bottom of page if there is no space for at least one guest
+                    top = helper.GetLinePosition(subHeaderFontSize + 3, subHeaderFontSize + 3 + cutFontSize + 2 + normalFontSize + 2 + normalFontSize);
+                    // Draw Host name
+                    helper.Gfx.DrawString($"Host: {groep.Host.Naam}", fontSubHeader, XBrushes.Black, left, top, XStringFormats.TopLeft);
 
-                    foreach(var gast in groep.Gasten)
+                    // TODO: Draw cutting line
+                    top = helper.GetLinePosition(cutFontSize + 2, cutFontSize);
+                    helper.Gfx.DrawString("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - knip hier - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ",
+                        fontCuttingLine, XBrushes.Black, left, top, XStringFormats.TopLeft);
+
+                    foreach (var gast in groep.Gasten)
                     {
-                        // Print Duos that ate at this host's place + next location for this duo to head to
-
                         // Do not place duo name at bottom of page if there is no space for destination
-                        XUnit top = helper.GetLinePosition(isHeader ? headerFontSize + 5 : normalFontSize + 2, isHeader ? headerFontSize + 5 + normalFontSize : normalFontSize);
+                        top = helper.GetLinePosition(normalFontSize + 2, normalFontSize + 2 + normalFontSize);
+                        // Draw Duo name
+                        helper.Gfx.DrawString($"{gast.Naam}", fontNormal, XBrushes.Black, left, top, XStringFormats.TopLeft);
+                        // Draw Duo destination
+                        top = helper.GetLinePosition(normalFontSize + 2, normalFontSize);
+                        helper.Gfx.DrawString($"Adres voor gang {gangNummer}: {groep.Host.Straat} {groep.Host.Huisnummer}, {groep.Host.PostCode}, {groep.Host.Stad}", fontItalic, XBrushes.Black, left, top, XStringFormats.TopLeft);
 
-                        helper.Gfx.DrawString(isHeader ? "Sed massa libero, semper a nisi nec" : "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-                            isHeader ? fontHeader : fontNormal, XBrushes.Black, left, top, XStringFormats.TopLeft);
+                        // TODO: Draw cutting line
+                        top = helper.GetLinePosition(cutFontSize + 2, cutFontSize);
+                        helper.Gfx.DrawString("- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - knip hier - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ",
+                            fontCuttingLine, XBrushes.Black, left, top, XStringFormats.TopLeft);
                     }
                 }
             }
@@ -73,8 +92,6 @@ namespace WalkingDinnerWebApplication.PDF_Printer
                 _document = document;
                 _topPosition = topPosition;
                 _bottomMargin = bottomMargin;
-                // Set a value outside the page - a new page will be created on the first request.
-                _currentPosition = bottomMargin + 10000;
             }
 
             public XUnit GetLinePosition(XUnit requestedHeight)
@@ -95,7 +112,7 @@ namespace WalkingDinnerWebApplication.PDF_Printer
             public XGraphics Gfx { get; private set; }
             public PdfPage Page { get; private set; }
 
-            void CreatePage()
+            public void CreatePage()
             {
                 Page = _document.AddPage();
                 Page.Size = PdfSharp.PageSize.A4;
