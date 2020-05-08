@@ -17,11 +17,4 @@ namespace WalkingDinnerWebApplication.ViewModels
         public ICollection<EventPlan> EventPlannen { get; set; }
         public ICollection<EventSchema> EventSchemas { get; set; }
     }
-
-    public class DuoEditViewModel
-    {
-        public string Naam { get; set; }
-        public string Postcode { get; set; }
-        public int Huisnummer { get; set; }
-    }
 }

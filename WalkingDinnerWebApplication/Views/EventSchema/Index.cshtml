@@ -1,0 +1,42 @@
+﻿@model WalkingDinnerWebApplication.ViewModels.EventSchemaIndexViewModel
+
+@{
+    ViewBag.Title = "EventSchema Index";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<div class="table-responsive">
+    <table class="table table-striped table-condensed table-hover table-responsive table-bordered">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.EventSchemas.First().Naam)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.EventSchemas.First().VerzamelDatum)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.EventSchemas.First().VerzamelAdres)
+                </th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var item in Model.EventSchemas)
+            {
+                <tr onclick="window.location='@Url.Action("Details", "EventSchema", new { id = item.Id })'" style="cursor: pointer;">
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Naam)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.VerzamelDatum)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.VerzamelAdres)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

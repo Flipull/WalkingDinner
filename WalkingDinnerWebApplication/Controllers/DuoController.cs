@@ -11,21 +11,11 @@ using WalkingDinnerWebApplication.ViewModels;
 
 namespace WalkingDinnerWebApplication.Controllers
 {
-    public class EventSchemaController : Controller
+    public class DuoController : Controller
     {
         WalkingDinnerContext db = new WalkingDinnerContext();
 
-        public ActionResult Index()
-        {
-            EventSchemaIndexViewModel viewModel = new EventSchemaIndexViewModel
-            {
-                EventSchemas = db.EventSchemas.ToList()
-            };
-
-            return View(viewModel);
-        }
-
-        // GET: EventSchema/Details/{id}
+        // GET: Duo/Details/{id}
         public ActionResult Details(int? id)
         {
             if (id == null)
@@ -33,14 +23,14 @@ namespace WalkingDinnerWebApplication.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
 
-            EventSchema schema = db.EventSchemas.Find(id);
+            Duo duo = db.Duos.Find(id);
 
-            if(schema == null)
+            if (duo == null)
             {
                 return HttpNotFound();
             }
 
-            EventSchemaViewModel viewModel = schema.ToViewModel(db);
+            DuoDetailsViewModel viewModel = duo.ToDetailsViewModel(db);
             
             return View(viewModel);
         }

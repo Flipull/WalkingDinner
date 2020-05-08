@@ -6,9 +6,15 @@ using WalkingDinnerWebApplication.Models;
 
 namespace WalkingDinnerWebApplication.ViewModels
 {
+    public class EventSchemaIndexViewModel
+    {
+        public IEnumerable<EventSchema> EventSchemas { get; set; }
+    }
+
+
     public class EventSchemaViewModel
     {
-        //Schema
+        // Schema
         public string Naam { get; set; }
         public int AantalDeelnemers { get; set; }
         public int AantalGangen { get; set; }
@@ -18,7 +24,7 @@ namespace WalkingDinnerWebApplication.ViewModels
 
         public ICollection<GroepenPerGang> GroepsverdelingPerGang { get; set; }
 
-        //Duos
+        // Duos
         public Dictionary<Duo, List<PathData>> DuoData { get; set; }
     }
 
