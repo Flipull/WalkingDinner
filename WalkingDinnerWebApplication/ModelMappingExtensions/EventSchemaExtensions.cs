@@ -29,6 +29,8 @@ namespace WalkingDinnerWebApplication.ModelMappingExtensions
             {
                 var gang = new GroepenPerGang();
                 gang.GangNummer = gangNummer;
+                gang.StartTijd = g.StartTijd;
+                gang.EindTijd = g.EindTijd;
                 gang.Groepen = new List<GangGroep>();
 
                 foreach (var gg in g.Groepen)

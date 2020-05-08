@@ -31,6 +31,9 @@ namespace WalkingDinnerWebApplication.ViewModels
     public class GroepenPerGang
     {
         public int GangNummer { get; set; }
+
+        public DateTime StartTijd { get; set; }
+        public DateTime EindTijd { get; set; }
         public ICollection<GangGroep> Groepen { get; set; }
     }
 
