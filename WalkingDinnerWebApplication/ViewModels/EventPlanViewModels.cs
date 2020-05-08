@@ -20,6 +20,5 @@ namespace WalkingDinnerWebApplication.ViewModels
         public int AantalDuosPerGroep { get; set; }
         public string Naam { get; set; }
         public List<DuoDetailsViewModel> IngeschrevenDuos { get; set; }
-
     }
 }
