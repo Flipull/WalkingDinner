@@ -274,10 +274,12 @@ namespace WalkingDinnerWebApplication.DAL
             for (int i = 0; i < 250; i++)
             {
                 var new_schema = CreateSchemaFromPlan(plan, meetingloc);
-
                 var paths = CalculateSchemaPathing(new_schema);
-                var travel_dist = CalculatePathMapTravelDistance(paths);
+                
 
+
+                var travel_dist = CalculatePathMapSquaredDistance(paths);
+                
                 if (travel_dist < shortest_travel)
                 {
                     shortest_travel = travel_dist;
@@ -474,7 +476,7 @@ namespace WalkingDinnerWebApplication.DAL
 
             return paths;
         }
-        public float CalculatePathMapTravelDistance(Dictionary<Duo, List<PathData>> pathmap)
+        public float CalculatePathMapSquaredDistance(Dictionary<Duo, List<PathData>> pathmap)
         {
             double distance = 0;
             //voor elke duo, bereken de afstanden van zijn path
@@ -529,6 +531,15 @@ namespace WalkingDinnerWebApplication.DAL
             return list;
         }
 
+
+        private static int EXPECTED_TRAVELSPEEDS = 50_000;//meter per hour
+        private static float ROUND_TRESHOLD = 5/60f;//minutes precision on clock (in hours)
+        
+        private DateTime AddRoundedTime(DateTime input, float add_hours)
+        {
+            var addition = Math.Round(add_hours / ROUND_TRESHOLD + ROUND_TRESHOLD) * ROUND_TRESHOLD;
+            return input.AddHours(addition);
+        }
         private EventSchema CreateSchemaFromPlan(EventPlan plan, PostcodeGeoLocationCache geoloc)
         {
             //sanity-check which should never be triggered
@@ -545,7 +556,8 @@ namespace WalkingDinnerWebApplication.DAL
                 Naam = plan.Naam,
 
                 VerzamelAdres = $"{geoloc.Straat} {geoloc.NummerMin}, {geoloc.Stad}",
-                VerzamelDatum = DateTime.Now,
+                //datum: altijd, morgen-avond 18 uur
+                VerzamelDatum = DateTime.Now.AddDays(1).Date.AddHours(18),
                 VerzamelLocatieLong = geoloc.GeoLong,
                 VerzamelLocatieLat = geoloc.GeoLat,
                 VerzamelPostcode = geoloc.Postcode
@@ -581,8 +593,6 @@ namespace WalkingDinnerWebApplication.DAL
             //elke groep bestaat uit verticale slices van de matrix 
             var gang1 = new Gang()
             {
-                StartTijd = DateTime.Now,
-                EindTijd = DateTime.Now
             };
             for (int g = 0; g < plan.AantalGroepen; g++)
             {
@@ -608,8 +618,6 @@ namespace WalkingDinnerWebApplication.DAL
             //  waarbij elke x-index met %AantalGroepen wrapped geselecteerd word)
             var gang2 = new Gang()
             {
-                StartTijd = DateTime.Now,
-                EindTijd = DateTime.Now
             };
             for (int g = 0; g < plan.AantalGroepen; g++)
             {
@@ -627,17 +635,15 @@ namespace WalkingDinnerWebApplication.DAL
             result.Gangen.Add(gang2);
 
 
+            var gang3 = new Gang()
+            {
+            };
             if (plan.AantalGangen >= 3)
             {
                 //gang 3:
                 //elke groep bestaat uit diagonale slices van de matrix 
                 //(groep 1 = [0,3],[1,2],[2,1],[3,0] groep 2 = [1,3],[2,2],[3,1],[4,0] tot aan AantalGroepen
                 //  waarbij elke x-index met %AantalGroepen wrapped geselecteerd word)
-                var gang3 = new Gang()
-                {
-                    StartTijd = DateTime.Now,
-                    EindTijd = DateTime.Now
-                };
                 for (int g = 0; g < plan.AantalGroepen; g++)
                 {
                     var groep = new Groep();
@@ -655,6 +661,9 @@ namespace WalkingDinnerWebApplication.DAL
 
             }
 
+            var gang4 = new Gang()
+            {
+            };
             if (plan.AantalGangen >= 4)
             {
                 //gang 4:
@@ -665,11 +674,6 @@ namespace WalkingDinnerWebApplication.DAL
                 //elke groep bestaat uit een mixed set van de matrix 
                 //(groep 1 = [1,0],[3,1],[0,2],[2,3] groep 2 = [2,0],[4,1],[1,2],[3,3] tot aan AantalGroepen
                 //  waarbij elke x-index met %AantalGroepen wrapped geselecteerd word)
-                var gang4 = new Gang()
-                {
-                    StartTijd = DateTime.Now,
-                    EindTijd = DateTime.Now
-                };
                 for (int g = 0; g < plan.AantalGroepen; g++)
                 {
                     var groep = new Groep();
@@ -692,6 +696,38 @@ namespace WalkingDinnerWebApplication.DAL
                 result.Gangen.Add(gang4);
 
             }
+
+
+
+            var pathing = CalculateSchemaPathing(result);
+            var paths_max_distance = new float[plan.AantalGangen];
+
+            //pathing= [[home],[meetpoint], [g1], [g2], [g3],  [g4], [home] ]
+
+
+            for (var i = 0; i < plan.AantalGangen; i++)
+            {
+                paths_max_distance[i] = pathing.Max(a => a.Value[i+2].Distance);
+            }
+
+            gang1.StartTijd = AddRoundedTime(result.VerzamelDatum, paths_max_distance[0] / EXPECTED_TRAVELSPEEDS);
+            gang1.EindTijd = gang1.StartTijd.AddHours(0.25);
+
+            gang2.StartTijd = AddRoundedTime(gang1.EindTijd, paths_max_distance[1] / EXPECTED_TRAVELSPEEDS);
+            gang2.EindTijd = gang2.StartTijd.AddHours(0.5);
+            
+            if (plan.AantalGangen >= 3)
+            {
+                gang3.StartTijd = AddRoundedTime(gang2.EindTijd, paths_max_distance[2] / EXPECTED_TRAVELSPEEDS);
+                gang3.EindTijd = gang3.StartTijd.AddHours(1);
+            }
+            
+            if (plan.AantalGangen >= 4)
+            {
+                gang4.StartTijd = AddRoundedTime(gang3.EindTijd, paths_max_distance[3] / EXPECTED_TRAVELSPEEDS);
+                gang4.EindTijd = gang4.StartTijd.AddHours(0.5);
+            }
+
             return result;
         }
 

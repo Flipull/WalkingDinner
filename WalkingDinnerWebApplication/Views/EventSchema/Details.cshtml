@@ -138,8 +138,8 @@
         <table class="table-bordered">
             <thead>
                 <tr>
-                    <th width="60px">
-
+                    <th width="90px">
+                        
                     </th>
                     @for (int i = 1; i <= Model.AantalGroepenPerGang; i++)
                     {
@@ -156,6 +156,9 @@
                     <tr>
                         <td>
                             <b>Gang @gang.GangNummer.ToString()</b>
+                            <small style="display: block;">
+                                ( @gang.StartTijd.ToString("HH:mm") - @gang.EindTijd.ToString("HH:mm") )
+                            </small>
                         </td>
                         @foreach (var groep in gang.Groepen)
                         {
