@@ -84,6 +84,5 @@ namespace WalkingDinnerWebApplication.Controllers
             
             return RedirectToAction("Details","EventSchema", new { id = schema.Id });
         }
-
     }
 }

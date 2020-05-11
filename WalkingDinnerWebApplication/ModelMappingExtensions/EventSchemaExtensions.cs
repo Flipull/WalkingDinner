@@ -14,6 +14,7 @@ namespace WalkingDinnerWebApplication.ModelMappingExtensions
         {
             var viewModel = new EventSchemaViewModel
             {
+                Id = model.Id,
                 Naam = model.Naam,
                 AantalDeelnemers = model.AantalDeelnemers,
                 AantalGangen = model.AantalGangen,

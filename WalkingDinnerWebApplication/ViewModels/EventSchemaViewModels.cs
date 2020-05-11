@@ -15,6 +15,7 @@ namespace WalkingDinnerWebApplication.ViewModels
     public class EventSchemaViewModel
     {
         // Schema
+        public int Id { get; set; }
         public string Naam { get; set; }
         public int AantalDeelnemers { get; set; }
         public int AantalGangen { get; set; }
